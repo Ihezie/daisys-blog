@@ -1,36 +1,47 @@
 "use client";
 
-import { AlignJustify } from "lucide-react";
+import AnimatedHamburger from "./AnimatedHamburger";
 import { Search } from "lucide-react";
-import Navbar from "./Navbar";
+import MobileNav from "./MobileNav";
 import { useState } from "react";
 import { AnimatePresence } from "motion/react";
-import { Playwrite_IN } from "next/font/google";
-
-const playwriteIN = Playwrite_IN({
-  weight: "400",
-});
+import { playwriteIN } from "../fonts";
+import DesktopNav from "./DesktopNav";
+import Link from "next/link";
 
 const Header = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   return (
     <header
-      className={`bg-white flex justify-between py-3 px-5 rounded-full relative ${
+      className={`bg-white flex justify-between items-center py-3 px-5 rounded-full relative ${
         isVisible ? "fixed " : ""
       }`}
     >
       <h1 className={`logo ${playwriteIN.className}`}>
-        Unripe-plantain
+        <Link className={playwriteIN.className} href="/">
+          Unripe-plantain
+        </Link>
       </h1>
-      <div className="flex text-center gap-3">
-        <button type="button">
+      <DesktopNav />
+      <div className="flex items-center gap-2">
+        <button className="sign-in-btn hidden md:block">
+          <Link href="/sign-in">Sign in</Link>
+        </button>
+        <button
+          type="button"
+          className="size-[38px] flex items-center justify-center rounded-full hover:bg-bright_pink_(crayola)-800"
+        >
           <Search />
         </button>
-        <button type="button" onClick={() => setIsVisible(!isVisible)}>
-          <AlignJustify />
+        <button
+          className="size-[38px] flex items-center justify-center rounded-full hover:bg-bright_pink_(crayola)-800 md:hidden"
+          type="button"
+          onClick={() => setIsVisible(!isVisible)}
+        >
+          <AnimatedHamburger isVisible={isVisible} />
         </button>
       </div>
-      <AnimatePresence>{isVisible && <Navbar />}</AnimatePresence>
+      <AnimatePresence>{isVisible && <MobileNav />}</AnimatePresence>
     </header>
   );
 };

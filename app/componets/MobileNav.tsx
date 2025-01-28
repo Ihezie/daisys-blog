@@ -1,9 +1,6 @@
 import { motion } from "motion/react";
 import { links } from "../data";
 import Link from "next/link";
-import { Newspaper } from "lucide-react";
-import { Heart } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
 
 const container = {
   hide: {
@@ -38,14 +35,14 @@ const children = {
   },
 };
 
-const Navbar = () => {
+const MobileNav = () => {
   return (
     <motion.nav
       variants={container}
       initial="hide"
       animate="show"
       exit="hide"
-      className={`absolute transition-none origin-top w-full h-[230px] right-0 top-5 rounded-[20px] -z-50 bg-white pt-16 px-5`}
+      className="absolute transition-none origin-top w-full h-[230px] right-0 top-5 rounded-[20px] -z-50 bg-white pt-16 px-5 md:hidden"
     >
       <ul className="flex flex-col items-center gap-3">
         {links.map(({ text, link }) => {
@@ -53,23 +50,24 @@ const Navbar = () => {
             <motion.li
               key={text}
               variants={children}
-              className={`font-bold flex gap-3 items-center ${
-                text === "Sign in"
-                  ? "text-bright_pink_(crayola) py-1 w-full text-center border-2 border-bright_pink_(crayola) rounded-full font-bold hover:bg-bright_pink_(crayola) hover:text-white transition-colors max-w-[370px] mx-auto duration-500"
-                  : " capitalize"
-              }`}
+              className="font-medium uppercase transition-none"
             >
-              {/* {text === "blog" && <Newspaper size={30} />}
-              {text === "favourites" && <Heart size={30} />}
-              {text === "shop" && <ShoppingBag size={30} />} */}
-              <Link className="w-full h-full block" href={link}>
+              <Link
+                className="w-full h-full block hover:text-bright_pink_(crayola)"
+                href={link}
+              >
                 {text}
               </Link>
             </motion.li>
           );
         })}
+        <motion.li variants={children} className="font-medium uppercase w-full transition-none">
+          <button className="block sign-in-btn w-full h-full">
+            <Link href="/sign-in">Sign in</Link>
+          </button>
+        </motion.li>
       </ul>
     </motion.nav>
   );
 };
-export default Navbar;
+export default MobileNav;
