@@ -8,8 +8,23 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "450px"
+      },
       colors: {
-        off_white: "#f2f2f3",
+        background: "#f2f2f3",
+        secondary: {
+          DEFAULT: "#f26a8d",
+          100: "#400614",
+          200: "#800b28",
+          300: "#bf113c",
+          400: "#ec295a",
+          500: "#f26a8d",
+          600: "#f587a2",
+          700: "#f7a5b9",
+          800: "#fac3d1",
+          900: "#fce1e8",
+        },
         ou_crimson: {
           DEFAULT: "#880d1e",
           100: "#1b0306",
@@ -45,18 +60,6 @@ export default {
           700: "#dff5f7",
           800: "#eaf8fa",
           900: "#f4fcfc",
-        },
-        "bright_pink_(crayola)": {
-          DEFAULT: "#f26a8d",
-          100: "#400614",
-          200: "#800b28",
-          300: "#bf113c",
-          400: "#ec295a",
-          500: "#f26a8d",
-          600: "#f587a2",
-          700: "#f7a5b9",
-          800: "#fac3d1",
-          900: "#fce1e8",
         },
       },
     },

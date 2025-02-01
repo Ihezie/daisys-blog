@@ -1,6 +1,6 @@
-import { links } from "../data";
+import { links } from "../../data";
 import Link from "next/link";
-import { oswald } from "../fonts";
+import { oswald } from "../../fonts";
 
 const DesktopNav = () => {
   return (
@@ -13,7 +13,7 @@ const DesktopNav = () => {
               className={`font-medium ${oswald.className} uppercase`}
             >
               <Link
-                className="w-full h-full block hover:text-bright_pink_(crayola)"
+                className="w-full h-full block hover:text-secondary"
                 href={link}
               >
                 {text}

@@ -2,20 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+@theme {
+  --breakpoint-xs: 23.125rem;
+}
 @layer base {
-  *{
-    @apply transition-all duration-500
+  * {
+    @apply transition-all duration-500;
   }
   html {
-    @apply bg-off_white;
+    @apply bg-background;
   }
-  a{
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-oswald);
+    @apply font-bold;
+  }
+  h1 {
+    @apply text-3xl;
+  }
+  a {
     font-family: var(--font-oswald);
   }
 }
 @layer utilities {
-  .logo {
-    font-size: 18px;
+  .abs-center-x {
+    @apply left-1/2 -translate-x-1/2;
   }
   .close span:nth-child(1) {
     animation: first-span 0.8s forwards;
@@ -77,10 +92,24 @@
       transform: translateY(0);
     }
   }
+  .prev-slide {
+    @apply -translate-x-full absolute;
+  }
+  .next-slide {
+    @apply translate-x-full absolute;
+  }
+  @media only screen and (max-height: 780px) {
+    .min-height {
+      @apply lg:min-h-[480px];
+    }
+  }
 }
 @layer components {
   .sign-in-btn {
     font-family: var(--font-oswald);
-    @apply text-bright_pink_(crayola) uppercase py-1 w-full text-center border-2 border-bright_pink_(crayola) rounded-full font-bold hover:bg-bright_pink_(crayola) hover:text-white transition-colors max-w-[370px] mx-auto duration-500 md:px-5 md:max-w-none md:w-auto;
+    @apply text-secondary uppercase py-1 w-full text-center border-2 border-secondary rounded-full font-bold hover:bg-secondary hover:text-white max-w-[370px] mx-auto duration-150 md:px-5 md:max-w-none md:w-auto;
+  }
+  .sign-in-btn a {
+    @apply duration-150;
   }
 }
