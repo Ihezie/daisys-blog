@@ -10,7 +10,7 @@ import CarouselIndicators from "./CarouselIndicators";
 
 const Carousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [play, setPlay] = useState(false);
+  const [play, setPlay] = useState(true);
   const nextSlide = () => {
     if (currentIndex === carouselData.length - 1) {
       setCurrentIndex(0);

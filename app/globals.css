@@ -24,13 +24,22 @@
   h1 {
     @apply text-3xl;
   }
+  h2{
+    @apply text-2xl
+  }
   a {
     font-family: var(--font-oswald);
   }
 }
 @layer utilities {
+  .transition-right-left{
+    transition: right left 500ms
+  }
   .abs-center-x {
     @apply left-1/2 -translate-x-1/2;
+  }
+  .abs-center-y {
+    @apply top-1/2 -translate-y-1/2;
   }
   .close span:nth-child(1) {
     animation: first-span 0.8s forwards;

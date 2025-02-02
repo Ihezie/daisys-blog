@@ -17,9 +17,18 @@ interface BlogDesc {
   title: string;
   body: string;
 }
+export interface Category {
+  image: string;
+  animatedIcon: {
+    src: string;
+    alt: string;
+  };
+  color: string;
+}
 
-export const categories = {
+export const categories: { [key: string]: Category } = {
   skincare: {
+    image: "/category-images/skincare.jpeg",
     animatedIcon: {
       src: "/organic-cream.gif",
       alt: "organic-cream",
@@ -27,13 +36,15 @@ export const categories = {
     color: "bg-orange-400",
   },
   makeup: {
+    image: "/category-images/makeup.jpeg",
     animatedIcon: {
-      src: "/blush.git",
+      src: "/blush.gif",
       alt: "blush",
     },
     color: "bg-green-400",
   },
   exercise: {
+    image: "/category-images/exercise.jpeg",
     animatedIcon: {
       src: "/training.gif",
       alt: "woman-training",
@@ -41,13 +52,15 @@ export const categories = {
     color: "bg-yellow-400",
   },
   haircare: {
+    image: "/category-images/haircare.jpeg",
     animatedIcon: {
-      src: "",
-      alt: "",
+      src: "/hairdryer.gif",
+      alt: "hairdryer",
     },
     color: "bg-blue-400",
   },
   fashion: {
+    image: "/category-images/fashion.jpeg",
     animatedIcon: {
       src: "/dress.gif",
       alt: "dress",
@@ -55,9 +68,10 @@ export const categories = {
     color: "bg-green-400",
   },
   soliloquies: {
+    image: "/category-images/soliloquies.jpeg",
     animatedIcon: {
-      src: "",
-      alt: "",
+      src: "/brain.gif",
+      alt: "brain",
     },
     color: "bg-purple-400",
   },
