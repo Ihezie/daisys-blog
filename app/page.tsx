@@ -1,9 +1,9 @@
-import Carousel from "./components/home/Carousel";
+import HeroCarousel from "./components/home/HeroCarousel";
 import CategoryCarousel from "./components/home/CategoryCarousel";
 export default function Home() {
   return (
-    <main>
-      <Carousel />
+    <main className="">
+      <HeroCarousel />
       <CategoryCarousel />
     </main>
   );

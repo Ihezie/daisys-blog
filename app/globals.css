@@ -25,7 +25,7 @@
     @apply text-3xl;
   }
   h2{
-    @apply text-2xl
+    @apply text-[27px]
   }
   a {
     font-family: var(--font-oswald);

@@ -7,10 +7,11 @@ import Link from "next/link";
 import { MoveRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import CarouselIndicators from "./CarouselIndicators";
+import { socials } from "@/app/data";
 
-const Carousel = () => {
+const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [play, setPlay] = useState(true);
+  const [play, setPlay] = useState(false);
   const nextSlide = () => {
     if (currentIndex === carouselData.length - 1) {
       setCurrentIndex(0);
@@ -87,28 +88,18 @@ const Carousel = () => {
             />
           </header>
           <p className="mt-4 lg:mt-8">{carouselData[currentIndex]?.body}</p>
-          <div className="mt-2 space-x-2">
-            <Image
-              src="/dress.gif"
-              width={40}
-              height={40}
-              className="inline-block"
-              alt="dress"
-            />
-            <Image
-              src="/organic-cream.gif"
-              width={40}
-              height={40}
-              className="inline-block"
-              alt="organic-cream"
-            />
-            <Image
-              src="/training.gif"
-              width={40}
-              height={40}
-              className="inline-block"
-              alt="organic-cream"
-            />
+          <div className="mt-2 space-x-5 lg:mt-8">
+            {socials.map(({ icon, link, name }) => (
+              <Link href={link} key={name}>
+                <Image
+                  src={icon}
+                  width={512}
+                  height={512}
+                  className={`inline-block hover:scale-75  ${name === "youtube" ? "w-9" : "w-[26px]"}`}
+                  alt={name}
+                />
+              </Link>
+            ))}
           </div>
         </article>
       ) : (
@@ -141,4 +132,4 @@ const Carousel = () => {
     </section>
   );
 };
-export default Carousel;
+export default HeroCarousel;

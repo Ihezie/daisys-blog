@@ -9,7 +9,7 @@ interface BlogPost {
   category: string;
   date: string;
   body: string;
-  comments: any[];
+  comments?: any[];
 }
 interface BlogDesc {
   id: string;
@@ -76,6 +76,13 @@ export const categories: { [key: string]: Category } = {
     color: "bg-purple-400",
   },
 };
+
+export const socials: { icon: string; name: string; link: string }[] = [
+  { icon: "/social-icons/black/tik-tok.png", name: "tik-tok", link: "" },
+  { icon: "/social-icons/black/instagram.png", name: "instagram", link: "" },
+  { icon: "/social-icons/black/youtube.png", name: "youtube", link: "" },
+  { icon: "/social-icons/black/twitter.png", name: "twitter", link: "" },
+];
 
 export const links: Link[] = [
   { text: "posts", link: "/posts" },

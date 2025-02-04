@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${josefinSans.className} ${oswald.variable} antialiased px-[5%] pt-5 sm:px-[10%] xl:px-[13%]`}
+        className={`${josefinSans.className} ${oswald.variable} antialiased max-w-[1440px] mx-auto px-[5%] pt-5 sm:px-[10%] xl:px-[13%]`}
       >
         <Header />
         {children}
