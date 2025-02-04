@@ -30,7 +30,7 @@ export const categories: { [key: string]: Category } = {
   skincare: {
     image: "/category-images/skincare.jpeg",
     animatedIcon: {
-      src: "/organic-cream.gif",
+      src: "/animated-icons/organic-cream.gif",
       alt: "organic-cream",
     },
     color: "bg-orange-400",
@@ -38,7 +38,7 @@ export const categories: { [key: string]: Category } = {
   makeup: {
     image: "/category-images/makeup.jpeg",
     animatedIcon: {
-      src: "/blush.gif",
+      src: "/animated-icons/blush.gif",
       alt: "blush",
     },
     color: "bg-green-400",
@@ -46,7 +46,7 @@ export const categories: { [key: string]: Category } = {
   exercise: {
     image: "/category-images/exercise.jpeg",
     animatedIcon: {
-      src: "/training.gif",
+      src: "/animated-icons/training.gif",
       alt: "woman-training",
     },
     color: "bg-yellow-400",
@@ -54,7 +54,7 @@ export const categories: { [key: string]: Category } = {
   haircare: {
     image: "/category-images/haircare.jpeg",
     animatedIcon: {
-      src: "/hairdryer.gif",
+      src: "/animated-icons/hairdryer.gif",
       alt: "hairdryer",
     },
     color: "bg-blue-400",
@@ -62,7 +62,7 @@ export const categories: { [key: string]: Category } = {
   fashion: {
     image: "/category-images/fashion.jpeg",
     animatedIcon: {
-      src: "/dress.gif",
+      src: "/animated-icons/dress.gif",
       alt: "dress",
     },
     color: "bg-green-400",
@@ -70,7 +70,7 @@ export const categories: { [key: string]: Category } = {
   soliloquies: {
     image: "/category-images/soliloquies.jpeg",
     animatedIcon: {
-      src: "/brain.gif",
+      src: "/animated-icons/brain.gif",
       alt: "brain",
     },
     color: "bg-purple-400",
@@ -93,7 +93,7 @@ export const links: Link[] = [
 export const carouselData: any[] = [
   {
     id: "blog-desc",
-    image: "/daisy-3.jpg",
+    image: "/daisy/daisy-3.jpg",
     title: "Hey stranger!",
     body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, eligendi a! Qui impedit dolore magni omnis sunt! Adipisci a placeat distinctio et necessitatibus enim quod voluptates sit, commodi earum dolor?",
   },
