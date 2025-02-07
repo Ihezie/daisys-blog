@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { links } from "../../data";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const container = {
   hide: {
@@ -44,6 +45,7 @@ const overlay = {
 };
 
 const MobileNav = () => {
+  const pathName = usePathname();
   return (
     <>
       <motion.nav
@@ -62,7 +64,9 @@ const MobileNav = () => {
                 className="font-medium uppercase transition-none"
               >
                 <Link
-                  className="w-full h-full block hover:text-secondary"
+                  className={`w-full h-full block hover:text-secondary ${
+                    pathName === link ? "text-secondary" : ""
+                  }`}
                   href={link}
                 >
                   {text}

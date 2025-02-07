@@ -9,7 +9,11 @@ export default {
   theme: {
     extend: {
       screens: {
-        xs: "450px"
+        xs: "450px",
+      },
+      gridTemplateColumns: {
+        "auto-fill": "repeat(auto-fill, minmax(280px, 1fr))",
+        "auto-fit": "repeat(auto-fit, minmax(280px, 1fr))",
       },
       colors: {
         background: "#f2f2f3",

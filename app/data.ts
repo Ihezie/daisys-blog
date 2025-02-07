@@ -85,9 +85,9 @@ export const socials: { icon: string; name: string; link: string }[] = [
 ];
 
 export const links: Link[] = [
+  { text: "home", link: "/" },
   { text: "posts", link: "/posts" },
   { text: "favourites", link: "/favourites" },
-  { text: "shop", link: "/shop" },
 ];
 
 export const carouselData: any[] = [

@@ -8,9 +8,12 @@ import { AnimatePresence } from "motion/react";
 import DesktopNav from "./DesktopNav";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const pathName = usePathname();
   return (
     <>
       <header
@@ -32,12 +35,14 @@ const Header = () => {
           <button className="sign-in-btn hidden md:block">
             <Link href="/sign-in">Sign in</Link>
           </button>
-          <button
-            type="button"
-            className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800"
-          >
-            <Search />
-          </button>
+          {pathName !== "/posts" && (
+            <button
+              type="button"
+              className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800"
+            >
+              <Search />
+            </button>
+          )}
           <button
             className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800 md:hidden"
             type="button"
