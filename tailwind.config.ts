@@ -13,7 +13,7 @@ export default {
         xs: "450px",
       },
       gridTemplateColumns: {
-        "auto-fill": "repeat(auto-fill, minmax(280px, 1fr))",
+        "auto-fill": "repeat(auto-fill, 280px)",
         "auto-fit": "repeat(auto-fit, minmax(280px, 1fr))",
       },
       colors: {

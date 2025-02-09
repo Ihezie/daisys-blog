@@ -7,8 +7,8 @@ import { Metadata } from "next";
 import Filter from "@/app/components/Filter";
 
 export const metadata: Metadata = {
-  title: "Posts"
-}
+  title: "Posts",
+};
 
 const POSTS_QUERY = defineQuery(
   `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }`
@@ -25,7 +25,7 @@ const Posts = async () => {
         <SearchBar />
         <Filter />
       </header>
-      <section className="grid grid-cols-auto-fill gap-8">
+      <section className="grid grid-cols-auto-fill gap-8 justify-between max-[740px]:justify-center">
         {posts.length > 0 ? (
           posts.map((post) => <PostCard post={post} key={post._id} />)
         ) : (
