@@ -15,7 +15,7 @@ const DesktopNav = () => {
               className={`font-medium ${oswald.className} uppercase`}
             >
               <Link
-                className={`w-full h-full block hover:text-secondary ${
+                className={`w-full h-full custom-transition block hover:text-secondary ${
                   pathName === link ? "text-secondary" : ""
                 }`}
                 href={link}

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { josefinSans, oswald } from "./fonts";
 import "./globals.css";
-import Header from "./components/header/Header";
 
 export const metadata: Metadata = {
   title: {
@@ -19,10 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${josefinSans.className} ${oswald.variable} antialiased max-w-[1440px] mx-auto px-[5%] pt-5 sm:px-[10%] xl:px-[13%]`}
+        className={`${josefinSans.className} ${oswald.variable} antialiased `}
       >
-        <Header />
-        {children}
+        <section className="max-w-[1440px] mx-auto px-[5%] pt-5 sm:px-[10%] xl:px-[13%]">
+          {children}
+        </section>
       </body>
     </html>
   );

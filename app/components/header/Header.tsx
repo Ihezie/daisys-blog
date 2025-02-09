@@ -8,7 +8,6 @@ import { AnimatePresence } from "motion/react";
 import DesktopNav from "./DesktopNav";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 
 const Header = () => {
@@ -38,13 +37,13 @@ const Header = () => {
           {pathName !== "/posts" && (
             <button
               type="button"
-              className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800"
+              className="size-[38px] custom-transition flex items-center justify-center rounded-full hover:bg-secondary-800"
             >
               <Search />
             </button>
           )}
           <button
-            className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800 md:hidden"
+            className="size-[38px] flex items-center custom-transition justify-center rounded-full hover:bg-secondary-800 md:hidden"
             type="button"
             onClick={() => setIsVisible(!isVisible)}
           >

@@ -10,7 +10,7 @@ const CarouselIndicators = ({
       {[...Array(amount)].map((_, i) => (
         <span
           key={i}
-          className={`size-[6px]  inline-block rounded-full shadow-sm ${
+          className={`size-[6px] custom-transition inline-block rounded-full shadow-sm ${
             currentIndex === i ? "w-[14px] bg-secondary-700" : "bg-white"
           }`}
         ></span>

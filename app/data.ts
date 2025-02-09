@@ -9,7 +9,7 @@ interface BlogPost {
   category: string;
   date: string;
   body: string;
-  comments?: any[];
+  // comments?: any[];
 }
 interface BlogDesc {
   id: string;
@@ -41,7 +41,7 @@ export const categories: { [key: string]: Category } = {
       src: "/animated-icons/blush.gif",
       alt: "blush",
     },
-    color: "bg-green-400",
+    color: "bg-red-500",
   },
   exercise: {
     image: "/category-images/exercise.jpeg",
@@ -65,9 +65,9 @@ export const categories: { [key: string]: Category } = {
       src: "/animated-icons/dress.gif",
       alt: "dress",
     },
-    color: "bg-green-400",
+    color: "bg-green-500",
   },
-  soliloquies: {
+  musings: {
     image: "/category-images/soliloquies.jpeg",
     animatedIcon: {
       src: "/animated-icons/brain.gif",

@@ -47,10 +47,13 @@ const CategoryCarousel = () => {
         <div className="absolute abs-center-y -left-16 hidden md:flex">
           <CarouselBtn icon="left" handleClick={backwards} />
         </div>
-        <div ref={cardsContainerParentRef} className="md:overflow-hidden">
+        <div
+          ref={cardsContainerParentRef}
+          className="pt-8 pb-10 md:overflow-x-hidden"
+        >
           <div
             ref={cardsContainerRef}
-            className={`grid grid-cols-2 mt-6 gap-x-4 gap-y-10 justify-items-center md:flex md:gap-5 md:w-max`}
+            className={`grid grid-cols-2 custom-transition gap-x-4 gap-y-10 justify-items-center md:flex md:gap-5 md:w-max`}
           >
             {Object.entries(categories).map(([name, info]) => (
               <CategoryCard key={name} name={name} info={info} />

@@ -54,7 +54,7 @@ const HeroCarousel = () => {
                 width={1260}
                 height={1240}
                 alt={item.title}
-                className={`rounded-3xl ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] min-height object-cover lg:max-h-[500px]`}
+                className={`rounded-3xl custom-transition ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] min-height object-cover lg:max-h-[500px]`}
               />
             );
           })}
@@ -95,7 +95,7 @@ const HeroCarousel = () => {
                   src={icon}
                   width={512}
                   height={512}
-                  className={`inline-block hover:scale-75  ${name === "youtube" ? "w-9" : "w-[26px]"}`}
+                  className={`inline-block custom-transition hover:scale-75  ${name === "youtube" ? "w-9" : "w-[26px]"}`}
                   alt={name}
                 />
               </Link>
