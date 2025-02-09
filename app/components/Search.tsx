@@ -2,8 +2,8 @@ import { Search } from "lucide-react";
 
 const SearchBar = () => {
   return (
-    <form className="mb-10 px-5">
-      <div className="grid grid-cols-[auto_45px] border-b-2 border-black/60 text-lg pb-1 items-center has-[:focus]:border-secondary">
+    <form className="sm:w-1/2">
+      <div className="pl-5 pr-2 py-[6px] grid grid-cols-[auto_45px] border-2 border-gray-300 text-lg rounded-full items-center has-[:focus]:border-secondary-700">
         <label htmlFor="search" className="absolute top-[-9999px]">
           search
         </label>
@@ -15,9 +15,9 @@ const SearchBar = () => {
         />
         <button
           type="submit"
-          className="size-[45px] flex items-center justify-center rounded-full hover:bg-secondary-800"
+          className="size-[38px] flex items-center justify-center rounded-full hover:bg-secondary-800"
         >
-          <Search size={25} />
+          <Search size={22} />
         </button>
       </div>
     </form>

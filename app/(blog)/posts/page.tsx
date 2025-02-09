@@ -21,8 +21,10 @@ const Posts = async () => {
 
   return (
     <main className="pt-12">
-      <SearchBar />
-      <Filter/>
+      <header className="mb-10 flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+        <SearchBar />
+        <Filter />
+      </header>
       <section className="grid grid-cols-auto-fill gap-8">
         {posts.length > 0 ? (
           posts.map((post) => <PostCard post={post} key={post._id} />)
