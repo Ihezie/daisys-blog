@@ -20,9 +20,7 @@ export default function RootLayout({
       <body
         className={`${josefinSans.className} ${oswald.variable} antialiased `}
       >
-        <section className="max-w-[1440px] mx-auto px-[5%] pt-5 sm:px-[10%] xl:px-[13%]">
-          {children}
-        </section>
+        {children}
       </body>
     </html>
   );
