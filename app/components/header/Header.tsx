@@ -22,6 +22,7 @@ const Header = () => {
       >
         <Link href="/">
           <Image
+            priority
             src="/unripe-plantain.svg"
             width={122}
             height={26}
