@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { links } from "../../data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 const container = {
   hide: {
@@ -44,7 +45,11 @@ const overlay = {
   },
 };
 
-const MobileNav = () => {
+const MobileNav = ({
+  setIsVisible,
+}: {
+  setIsVisible: Dispatch<SetStateAction<boolean>>;
+}) => {
   const pathName = usePathname();
   return (
     <>
@@ -64,6 +69,9 @@ const MobileNav = () => {
                 className="font-medium uppercase transition-none"
               >
                 <Link
+                  onClick={() => {
+                    setIsVisible(false);
+                  }}
                   className={`w-full h-full custom-transition block hover:text-secondary ${
                     pathName === link ? "text-secondary" : ""
                   }`}
@@ -78,7 +86,12 @@ const MobileNav = () => {
             variants={children}
             className="font-medium uppercase w-full transition-none"
           >
-            <button className="block sign-in-btn w-full h-full">
+            <button
+              onClick={() => {
+                setIsVisible(false);
+              }}
+              className="block sign-in-btn w-full h-full"
+            >
               <Link href="/sign-in">Sign in</Link>
             </button>
           </motion.li>

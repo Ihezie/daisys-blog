@@ -52,7 +52,7 @@ const Header = () => {
           </button>
         </div>
       </header>
-      <AnimatePresence>{isVisible && <MobileNav />}</AnimatePresence>
+      <AnimatePresence>{isVisible && <MobileNav setIsVisible={setIsVisible}/>}</AnimatePresence>
     </>
   );
 };
