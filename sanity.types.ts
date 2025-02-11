@@ -206,6 +206,37 @@ export type Slug = {
 
 export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Category | Post | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./app/(blog)/page.tsx
+// Variable: CATEGORIES_QUERY
+// Query: *[_type == "category" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}
+export type CATEGORIES_QUERYResult = Array<{
+  _id: string;
+  name: string | null;
+  animatedIcon: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  tailwindColor: string | null;
+  image: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+}>;
+
 // Source: ./app/(blog)/posts/page.tsx
 // Variable: POSTS_QUERY
 // Query: *[_type == "post" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }
@@ -268,11 +299,19 @@ export type POSTS_QUERYResult = Array<{
     _key: string;
   }> | null;
 }>;
+// Variable: CATEGORY_NAMES_QUERY
+// Query: *[_type == "category" && defined(_id)]{_id, name}
+export type CATEGORY_NAMES_QUERYResult = Array<{
+  _id: string;
+  name: string | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    "*[_type == \"category\" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}": CATEGORIES_QUERYResult;
     "*[_type == \"post\" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }": POSTS_QUERYResult;
+    "*[_type == \"category\" && defined(_id)]{_id, name}": CATEGORY_NAMES_QUERYResult;
   }
 }

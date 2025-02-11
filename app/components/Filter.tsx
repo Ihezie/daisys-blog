@@ -1,3 +1,4 @@
+import type { CATEGORY_NAMES_QUERYResult } from "@/sanity.types";
 import {
   Select,
   SelectContent,
@@ -5,18 +6,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { categories } from "../data";
 
-export default function Filter() {
+export default function Filter({
+  categories,
+}: {
+  categories: CATEGORY_NAMES_QUERYResult;
+}) {
+  if (categories.length === 0) {
+    return (
+      <Select>
+        <SelectTrigger className="w-[150px]">
+          <SelectValue placeholder="none" />
+        </SelectTrigger>
+      </Select>
+    );
+  }
   return (
     <Select>
       <SelectTrigger className="w-[150px]">
         <SelectValue placeholder="Filter" />
       </SelectTrigger>
       <SelectContent>
-        {Object.keys(categories).map((category) => (
-          <SelectItem key={category} value={category}>
-            {category}
+        {categories.map(({ _id, name }) => (
+          <SelectItem key={_id} value={name || ""}>
+            {name}
           </SelectItem>
         ))}
       </SelectContent>

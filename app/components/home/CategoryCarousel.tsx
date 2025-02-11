@@ -1,11 +1,15 @@
 "use client";
 
 import CategoryCard from "./CategoryCard";
-import { categories } from "@/app/data";
 import CarouselBtn from "./CarouselBtn";
 import { useEffect, useRef } from "react";
+import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
-const CategoryCarousel = () => {
+const CategoryCarousel = ({
+  categories,
+}: {
+  categories: CATEGORIES_QUERYResult;
+}) => {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const cardsContainerParentRef = useRef<HTMLDivElement>(null);
   const forwards = () => {
@@ -55,8 +59,8 @@ const CategoryCarousel = () => {
             ref={cardsContainerRef}
             className={`grid grid-cols-2 custom-transition gap-x-4 gap-y-10 justify-items-center md:flex md:gap-5 md:w-max`}
           >
-            {Object.entries(categories).map(([name, info]) => (
-              <CategoryCard key={name} name={name} info={info} />
+            {categories?.map((category) => (
+              <CategoryCard key={category._id} category={category} />
             ))}
           </div>
         </div>

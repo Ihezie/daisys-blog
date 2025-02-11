@@ -14,6 +14,9 @@ export const metadata: Metadata = {
 const POSTS_QUERY = defineQuery(
   `*[_type == "post" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }`
 );
+const CATEGORY_NAMES_QUERY = defineQuery(
+  `*[_type == "category" && defined(_id)]{_id, name}`
+);
 
 const options = { next: { revalidate: 30 } };
 
@@ -29,11 +32,19 @@ const Posts = async (props: { searchParams?: Promise<{ term?: string }> }) => {
     options
   );
 
+  const categories = await client.fetch(
+    CATEGORY_NAMES_QUERY,
+    {},
+    {
+      cache: "force-cache",
+    }
+  );
+
   return (
     <main className="pt-12">
       <header className="mb-10 flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
         <SearchBar />
-        <Filter />
+        <Filter categories={categories} />
       </header>
       {posts.length > 0 ? (
         <section className="grid grid-cols-auto-fill gap-8 justify-between max-[740px]:justify-center">
@@ -44,7 +55,7 @@ const Posts = async (props: { searchParams?: Promise<{ term?: string }> }) => {
       ) : (
         <div className="items-center mt-20 text-[22px] flex flex-col gap-2">
           <span className="font-semibold">No Posts Found</span>
-          <Frown size={35} color="red"/>
+          <Frown size={35} color="red" />
         </div>
       )}
     </main>

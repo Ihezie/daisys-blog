@@ -30,23 +30,13 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
   return (
     <div className="w-[280px] h-[450px] mx-auto bg-white rounded-3xl cursor-pointer group custom-transition-all">
       <div className="h-[47%] overflow-hidden rounded-t-3xl">
-        {postImageUrl ? (
-          <Image
-            src={postImageUrl}
-            width={300}
-            height={200}
-            alt={post?.title || ""}
-            className="rounded-t-3xl object-cover group-hover:scale-125"
-          />
-        ) : (
-          <Image
-            src="/woman-skincare.jpg" //change this to filler image
-            width={300}
-            height={200}
-            alt="woman applying serum"
-            className="rounded-t-3xl h-[47%] object-cover"
-          />
-        )}
+        <Image
+          src={postImageUrl || "/no-image.jpg"}
+          width={300}
+          height={200}
+          alt={post?.title || "no image"}
+          className="rounded-t-3xl object-cover group-hover:scale-125"
+        />
       </div>
       <div className="px-5 pt-5">
         <div className="flex justify-between text-sm font-semibold">
