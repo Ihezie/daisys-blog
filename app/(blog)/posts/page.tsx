@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const POSTS_QUERY = defineQuery(
-  `*[_type == "post" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }`
+  `*[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }`
 );
 const CATEGORY_NAMES_QUERY = defineQuery(
   `*[_type == "category" && defined(_id)]{_id, name}`
@@ -20,9 +20,14 @@ const CATEGORY_NAMES_QUERY = defineQuery(
 
 const options = { next: { revalidate: 30 } };
 
-const Posts = async (props: { searchParams?: Promise<{ term?: string }> }) => {
+const Posts = async (props: {
+  searchParams?: Promise<{ term?: string; filter?: string }>;
+}) => {
   const searchParams = await props.searchParams;
-  let params = { term: searchParams?.term || null };
+  let params = {
+    term: searchParams?.term || null,
+    filter: searchParams?.filter || null,
+  };
   if (params.term) {
     params.term = params.term + "*"; // ensures that sanity matches posts that have titles that contain the term
   }
