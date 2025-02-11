@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const POSTS_QUERY = defineQuery(
-  `*[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }`
+  `*[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name}, image, body }`
 );
 const CATEGORY_NAMES_QUERY = defineQuery(
   `*[_type == "category" && defined(_id)]{_id, name}`

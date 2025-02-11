@@ -24,18 +24,8 @@ export const postType = defineType({
     }),
     defineField({
       name: "category",
-      type: "string",
-      initialValue: "musings",
-      options: {
-        list: [
-          { title: "Musings", value: "musings" },
-          { title: "Skincare", value: "skincare" },
-          { title: "Fashion", value: "fashion" },
-          { title: "Haircare", value: "haircare" },
-          { title: "Exercise", value: "exercise" },
-          { title: "Makeup", value: "makeup" },
-        ],
-      },
+      type: "reference",
+      to: { type: "category" },
     }),
     defineField({
       name: "image",
@@ -50,4 +40,3 @@ export const postType = defineType({
     }),
   ],
 });
-

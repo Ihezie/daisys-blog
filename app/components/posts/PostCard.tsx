@@ -41,9 +41,9 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
       <div className="px-5 pt-5">
         <div className="flex justify-between text-sm font-semibold">
           <span
-            className={`py-[2px] px-3 rounded-full ${categories[post?.category || "musings"]?.color}`}
+            className={`py-[2px] px-3 rounded-full ${categories[post?.category?.name || "musings"]?.color}`}
           >
-            {post?.category}
+            {post?.category?.name}
           </span>
           <span className="bg-cyan-200 py-[2px] px-3 rounded-full">
             {new Date(post?.publishedAt || "").toLocaleDateString("en-uk", {

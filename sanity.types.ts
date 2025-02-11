@@ -68,6 +68,52 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type Post = {
+  _id: string;
+  _type: "post";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  publishedAt?: string;
+  category?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "category";
+  };
+  image?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
+
 export type Category = {
   _id: string;
   _type: "category";
@@ -98,47 +144,6 @@ export type Category = {
     _type: "image";
   };
   tailwindColor?: string;
-};
-
-export type Post = {
-  _id: string;
-  _type: "post";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  publishedAt?: string;
-  category?: "musings" | "skincare" | "fashion" | "haircare" | "exercise" | "makeup";
-  image?: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
 };
 
 export type SanityImageCrop = {
@@ -204,7 +209,7 @@ export type Slug = {
   source?: string;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Category | Post | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Post | Category | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/(blog)/page.tsx
 // Variable: CATEGORIES_QUERY
@@ -239,36 +244,14 @@ export type CATEGORIES_QUERYResult = Array<{
 
 // Source: ./app/(blog)/posts/page.tsx
 // Variable: POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }
+// Query: *[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name}, image, body }
 export type POSTS_QUERYResult = Array<{
   _id: string;
   title: string | null;
-  publishedAt: null;
-  category: null;
-  image: null;
-  body: null;
-} | {
-  _id: string;
-  title: null;
-  publishedAt: null;
-  category: null;
-  image: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  } | null;
-  body: null;
-} | {
-  _id: string;
-  title: string | null;
   publishedAt: string | null;
-  category: "exercise" | "fashion" | "haircare" | "makeup" | "musings" | "skincare" | null;
+  category: {
+    name: string | null;
+  } | null;
   image: {
     asset?: {
       _ref: string;
@@ -311,7 +294,7 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     "*[_type == \"category\" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}": CATEGORIES_QUERYResult;
-    "*[_type == \"post\" && defined(slug.current) && !defined($term) || title match $term]|order(publishedAt desc){ _id, title, publishedAt, category, image, body }": POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name}, image, body }": POSTS_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name}": CATEGORY_NAMES_QUERYResult;
   }
 }
