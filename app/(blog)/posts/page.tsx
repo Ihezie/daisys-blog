@@ -1,22 +1,15 @@
 import SearchBar from "../../components/Search";
 import PostCard from "../../components/posts/PostCard";
-import { defineQuery } from "next-sanity";
 import { client } from "@/sanity/lib/client";
 import type { POSTS_QUERYResult } from "@/sanity.types";
 import { Metadata } from "next";
 import Filter from "@/app/components/Filter";
 import { Frown } from "lucide-react";
+import { POSTS_QUERY, CATEGORY_NAMES_QUERY } from "@/sanity/lib/queries";
 
 export const metadata: Metadata = {
   title: "Posts",
 };
-
-const POSTS_QUERY = defineQuery(
-  `*[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name}, image, body }`
-);
-const CATEGORY_NAMES_QUERY = defineQuery(
-  `*[_type == "category" && defined(_id)]{_id, name}`
-);
 
 const options = { next: { revalidate: 30 } };
 
