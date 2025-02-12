@@ -4,13 +4,7 @@ import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { client } from "@/sanity/lib/client";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
 import Link from "next/link";
-
-const { projectId, dataset } = client.config();
-
-const urlFor = (source: SanityImageSource) =>
-  projectId && dataset
-    ? imageUrlBuilder({ projectId, dataset }).image(source)
-    : null;
+import { urlFor } from "@/sanity/lib/image";
 
 const CategoryCard = ({
   category,

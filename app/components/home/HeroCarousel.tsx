@@ -2,14 +2,20 @@
 
 import Image from "next/image";
 import CarouselBtn from "./CarouselBtn";
-import { carouselData, categories } from "@/app/data";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import CarouselIndicators from "./CarouselIndicators";
-import { socials } from "@/app/data";
+import { AboutBlog } from "@/app/data";
+import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
+import { urlFor } from "@/sanity/lib/image";
+import { formatDate, formatPreview } from "@/lib/utils";
 
-const HeroCarousel = () => {
+const HeroCarousel = ({
+  carouselData = [],
+}: {
+  carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [play, setPlay] = useState(false);
   const nextSlide = () => {
@@ -36,6 +42,11 @@ const HeroCarousel = () => {
       };
     }
   }, [currentIndex, play]);
+
+  if (carouselData.length === 0) {
+    return <div>No Carousel Data</div>;
+  }
+
   return (
     <section className="mt-10 bg-white p-3 pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%]">
       <div className="relative rounded-3xl">
@@ -47,13 +58,21 @@ const HeroCarousel = () => {
             } else if (currentIndex < index) {
               position = "next-slide";
             }
+            let src = "";
+            if (item._type === "post") {
+              src = item.image
+                ? urlFor(item.image)?.width(1260).height(1240).url()
+                : "/no-image.jpg";
+            } else {
+              src = (item as AboutBlog).image;
+            }
             return (
               <Image
-                key={item.id}
-                src={item.image}
+                key={item.title}
+                src={src}
                 width={1260}
                 height={1240}
-                alt={item.title}
+                alt={item.title || "no title"}
                 className={`rounded-3xl custom-transition ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] min-height object-cover lg:max-h-[500px]`}
               />
             );
@@ -75,61 +94,76 @@ const HeroCarousel = () => {
           <CarouselBtn handleClick={nextSlide} icon="right" />
         </div>
       </div>
-      {carouselData[currentIndex]?.id === "blog-desc" ? (
-        <article className="mt-5 lg:mt-16 lg:px-8 max-xl:lg:mb-10 text-center lg:text-left">
-          <header className="flex gap-3 items-center justify-center lg:justify-start">
-            <h1>{carouselData[currentIndex].title}</h1>
-            <Image
-              src="/wave.gif"
-              width={40}
-              height={40}
-              className="inline-block"
-              alt="wave"
-            />
-          </header>
-          <p className="mt-4 lg:mt-8">{carouselData[currentIndex]?.body}</p>
-          <div className="mt-2 space-x-5 lg:mt-8">
-            {socials.map(({ icon, link, name }) => (
-              <Link href={link} key={name}>
-                <Image
-                  src={icon}
-                  width={512}
-                  height={512}
-                  className={`inline-block custom-transition hover:scale-75  ${name === "youtube" ? "w-9" : "w-[26px]"}`}
-                  alt={name}
-                />
-              </Link>
-            ))}
-          </div>
-        </article>
-      ) : (
-        <article className="mt-5 lg:mt-16 lg:px-8">
-          <h1>{carouselData[currentIndex].title}</h1>
-          <div className="flex mt-5 items-center justify-between">
-            <span
-              className={`${
-                categories[carouselData[currentIndex]?.category]?.color
-              } py-[2px] px-3 rounded-full`}
-            >
-              {carouselData[currentIndex]?.category}
-            </span>
-            <span className="font-semibold bg-cyan-200 py-[2px] px-3 rounded-full">
-              {carouselData[currentIndex]?.date}
-            </span>
-          </div>
-          <p className="mt-4 lg:mt-8">
-            {carouselData[currentIndex].body.slice(0, 200).trim()}
-            <span className="text-3xl/[0px]">&#8230;</span>
-            <button type="button" className="block mt-3">
-              <Link href="" className="hover:text-secondary group">
-                read more{" "}
-                <MoveRight className="inline-block group-hover:text-secondary transition-none" />{" "}
-              </Link>
-            </button>
-          </p>
-        </article>
-      )}
+      <TextSection currentItem={carouselData[currentIndex]} />
     </section>
   );
 };
 export default HeroCarousel;
+
+const TextSection = ({
+  currentItem,
+}: {
+  currentItem: AboutBlog | CAROUSEL_POSTS_QUERYResult[0];
+}) => {
+  if (currentItem._type === "about-blog") {
+    const currentItemData = currentItem as unknown as AboutBlog;
+    return (
+      <article className="mt-5 lg:mt-16 lg:px-8 max-xl:lg:mb-10 text-center lg:text-left">
+        <header className="flex gap-3 items-center justify-center lg:justify-start">
+          <h1>{currentItemData.title}</h1>
+          <Image
+            src="/wave.gif"
+            width={40}
+            height={40}
+            className="inline-block"
+            alt="wave"
+          />
+        </header>
+        <p className="mt-4 lg:mt-8">{currentItemData.body}</p>
+        <div className="mt-2 space-x-5 lg:mt-8">
+          {currentItemData.socials.map(({ icon, link, name }) => (
+            <Link href={link} key={name}>
+              <Image
+                src={icon}
+                width={512}
+                height={512}
+                className={`inline-block custom-transition hover:scale-75  ${name === "youtube" ? "w-9" : "w-[26px]"}`}
+                alt={name}
+              />
+            </Link>
+          ))}
+        </div>
+      </article>
+    );
+  } else {
+    const currentItemData =
+      currentItem as unknown as CAROUSEL_POSTS_QUERYResult[0];
+    let categoryColor: string | null | undefined =
+      currentItemData?.category?.tailwindColor;
+    categoryColor = categoryColor ? "bg-" + categoryColor : "bg-purple-400";
+    return (
+      <article className="mt-5 lg:mt-10 lg:px-8">
+        <h1>{currentItemData.title}</h1>
+        <div className="flex mt-5 items-center justify-between">
+          <span className={`${categoryColor} py-[2px] px-3 rounded-full`}>
+            {currentItemData?.category?.name}
+          </span>
+          <span className="font-semibold bg-cyan-200 py-[2px] px-3 rounded-full">
+            {formatDate(currentItemData?.publishedAt || "")}
+          </span>
+        </div>
+        <p className="mt-4 lg:mt-5">
+          {Array.isArray(currentItemData?.body) &&
+            formatPreview(currentItemData?.body, 200)}
+          <span className="text-3xl/[0px]">&#8230;</span>
+          <button type="button" className="block mt-3">
+            <Link href="" className="hover:text-secondary group custom-transition">
+              read more{" "}
+              <MoveRight className="inline-block group-hover:text-secondary custom-transition" />{" "}
+            </Link>
+          </button>
+        </p>
+      </article>
+    );
+  }
+};
