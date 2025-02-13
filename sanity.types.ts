@@ -213,9 +213,10 @@ export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/lib/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name, tailwindColor}, image, body }
+// Query: *[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }
 export type POSTS_QUERYResult = Array<{
   _id: string;
+  slug: Slug | null;
   title: string | null;
   publishedAt: string | null;
   category: {
@@ -288,10 +289,11 @@ export type CATEGORIES_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: CAROUSEL_POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]
+// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]
 export type CAROUSEL_POSTS_QUERYResult = Array<{
   _type: "post";
   _id: string;
+  slug: Slug | null;
   title: string | null;
   publishedAt: string | null;
   category: {
@@ -328,14 +330,55 @@ export type CAROUSEL_POSTS_QUERYResult = Array<{
     _key: string;
   }> | null;
 }>;
+// Variable: SINGLE_POST_QUERY
+// Query: *[_type == "post" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]
+export type SINGLE_POST_QUERYResult = {
+  _id: string;
+  title: string | null;
+  publishedAt: string | null;
+  category: {
+    name: string | null;
+    tailwindColor: string | null;
+  } | null;
+  image: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+} | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, title, publishedAt, category -> {name, tailwindColor}, image, body }": POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }": POSTS_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name}": CATEGORY_NAMES_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}": CATEGORIES_QUERYResult;
-    "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]": CAROUSEL_POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]": CAROUSEL_POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]": SINGLE_POST_QUERYResult;
   }
 }

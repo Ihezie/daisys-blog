@@ -138,9 +138,9 @@ const TextSection = ({
   } else {
     const currentItemData =
       currentItem as unknown as CAROUSEL_POSTS_QUERYResult[0];
-    let categoryColor: string | null | undefined =
-      currentItemData?.category?.tailwindColor;
-    categoryColor = categoryColor ? "bg-" + categoryColor : "bg-purple-400";
+    const categoryColor =
+      currentItemData.category?.tailwindColor || "bg-purple-400";
+
     return (
       <article className="mt-5 lg:mt-10 lg:px-8">
         <h1>{currentItemData.title}</h1>
@@ -157,7 +157,10 @@ const TextSection = ({
             formatPreview(currentItemData?.body, 200)}
           <span className="text-3xl/[0px]">&#8230;</span>
           <button type="button" className="block mt-3">
-            <Link href="" className="hover:text-secondary group custom-transition">
+            <Link
+              href=""
+              className="hover:text-secondary group custom-transition"
+            >
               read more{" "}
               <MoveRight className="inline-block group-hover:text-secondary custom-transition" />{" "}
             </Link>

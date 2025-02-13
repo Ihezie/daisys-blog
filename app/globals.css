@@ -1,6 +1,8 @@
+@plugin "@tailwindcss/typography";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @theme {
   --breakpoint-xs: 23.125rem;
@@ -111,6 +113,9 @@
   }
   .open.open.can-animate span:nth-child(3) {
     animation: last-span-reverse 0.8s forwards;
+  }
+  .hover-effect:hover + div p a span{
+    @apply text-secondary
   }
 
   @keyframes first-span {

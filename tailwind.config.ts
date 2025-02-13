@@ -7,8 +7,19 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    "bg-yellow-400",
+    "bg-green-500",
+    "bg-blue-400",
+    "bg-purple-400",
+    "bg-red-400",
+    "bg-orange-400",
+  ],
   theme: {
     extend: {
+      fontFamily: {
+        "font-oswald": "fon",
+      },
       screens: {
         xs: "450px",
       },
@@ -123,5 +134,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
