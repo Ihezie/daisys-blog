@@ -1,12 +1,12 @@
 import { SINGLE_POST_QUERY } from "@/sanity/lib/queries";
 import { client } from "@/sanity/lib/client";
 import { SINGLE_POST_QUERYResult } from "@/sanity.types";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ArrowDown, ArrowRight } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { PortableText } from "next-sanity";
-import { ArrowDown } from "lucide-react";
+
 
 const myPortableTextComponents = {
   block: {
@@ -53,17 +53,19 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
         width={1500}
         height={1200}
         alt={post?.title || ""}
-        className="mt-8 rounded-2xl max-h-[600px] object-cover"
+        className="mt-8 rounded-2xl max-h-[550px] object-cover"
       />
-      {Array.isArray(post?.body) && <TableOfContents body={post.body} />}
-      <article className="mt-16 prose">
-        {Array.isArray(post?.body) && (
-          <PortableText
-            value={post.body}
-            components={myPortableTextComponents}
-          />
-        )}
-      </article>
+      <section className="xl:grid xl:grid-cols-[35%_61%] xl:mt-16 xl:gap-[4%]">
+        {Array.isArray(post?.body) && <TableOfContents body={post.body} />}
+        <article className="mt-16 prose xl:mt-0">
+          {Array.isArray(post?.body) && (
+            <PortableText
+              value={post.body}
+              components={myPortableTextComponents}
+            />
+          )}
+        </article>
+      </section>
     </main>
   );
 };
@@ -93,8 +95,8 @@ const TableOfContents = ({
 }) => {
   const headings = ["h1", "h2", "h3", "h4", "h5", "h6"];
   return (
-    <nav className="mt-6">
-      <ul>
+    <nav className="mt-6 xl:mt-0">
+      <ul className="xl:sticky xl:top-28">
         {body.map((item) => {
           if (headings.includes(item?.style || "")) {
             const text = [
@@ -109,7 +111,8 @@ const TableOfContents = ({
                   <span className="group-hover:text-secondary custom-transition">
                     {text}
                   </span>
-                  <ArrowDown className="group-hover:text-secondary custom-transition" />
+                  <ArrowDown className="group-hover:text-secondary custom-transition xl:hidden" />
+                  <ArrowRight className="group-hover:text-secondary custom-transition hidden xl:block" />
                 </a>
               </li>
             );

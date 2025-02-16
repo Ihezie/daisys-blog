@@ -9,7 +9,7 @@
 }
 @layer base {
   html {
-    @apply bg-background;
+    @apply bg-background scroll-smooth scroll-p-[85px];
   }
   h1,
   h2,
