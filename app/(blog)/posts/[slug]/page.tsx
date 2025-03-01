@@ -29,8 +29,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const postImageUrl = post?.image
     ? urlFor(post.image)?.width(1500).height(1200).url()
     : null;
-  console.log(post);
-
+    
   const categoryColor = post?.category?.tailwindColor || "bg-purple-400";
   return (
     <main className="pt-6">

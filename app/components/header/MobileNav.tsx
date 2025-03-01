@@ -3,6 +3,7 @@ import { links } from "../../data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
+import SignIn from "../SignIn";
 
 const container = {
   hide: {
@@ -83,17 +84,21 @@ const MobileNav = ({
             );
           })}
           <motion.li
+            onClick={() => {
+              setIsVisible(false);
+            }}
             variants={children}
             className="font-medium uppercase w-full transition-none"
           >
-            <button
+            <SignIn className="block w-full h-full" />
+            {/* <button
               onClick={() => {
                 setIsVisible(false);
               }}
               className="block sign-in-btn w-full h-full"
             >
               <Link href="/sign-in">Sign in</Link>
-            </button>
+            </button> */}
           </motion.li>
         </ul>
       </motion.nav>

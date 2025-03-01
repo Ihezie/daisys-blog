@@ -9,6 +9,7 @@ import DesktopNav from "./DesktopNav";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import SignIn from "../SignIn";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -22,7 +23,7 @@ const Header = () => {
       >
         <Link href="/">
           <Image
-            priority
+             priority
             src="/unripe-plantain.svg"
             width={122}
             height={26}
@@ -32,17 +33,15 @@ const Header = () => {
         </Link>
         <DesktopNav />
         <div className="flex items-center gap-2">
-          <button className="sign-in-btn hidden md:block">
-            <Link href="/sign-in">Sign in</Link>
-          </button>
-          {pathName !== "/posts" && (
+          <SignIn className="sign-in-btn hidden w-28 md:block" />
+          {/* {pathName !== "/posts" && (
             <button
               type="button"
               className="size-[38px] custom-transition flex items-center justify-center rounded-full hover:bg-secondary-800"
             >
               <Search />
             </button>
-          )}
+          )} */}
           <button
             className="size-[38px] flex items-center custom-transition justify-center rounded-full hover:bg-secondary-800 md:hidden"
             type="button"

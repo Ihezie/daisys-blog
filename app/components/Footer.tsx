@@ -40,7 +40,7 @@ const Footer = () => {
                 width={512}
                 height={512}
                 color="white"
-                className={`inline-block custom-transition hover:scale-75  ${name === "youtube" ? "w-9 md:w-7 lg:w-9" : "w-[26px] md:w-[20px] lg:w-[26px]"}`}
+                className={`inline-block custom-transition hover:scale-75 !duration-300 ${name === "youtube" ? "w-9 md:w-7 lg:w-9" : "w-[26px] md:w-[20px] lg:w-[26px]"}`}
                 alt={name}
               />
             </Link>
