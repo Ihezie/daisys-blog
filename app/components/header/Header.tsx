@@ -3,7 +3,7 @@
 import AnimatedHamburger from "./AnimatedHamburger";
 import { Search } from "lucide-react";
 import MobileNav from "./MobileNav";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import DesktopNav from "./DesktopNav";
 import Link from "next/link";
@@ -11,9 +11,10 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SignIn from "../SignIn";
 
-const Header = () => {
+const Header = ({ children }: { children: ReactNode }) => {
   const [isVisible, setIsVisible] = useState(false);
   const pathName = usePathname();
+
   return (
     <>
       <header
@@ -23,7 +24,7 @@ const Header = () => {
       >
         <Link href="/">
           <Image
-             priority
+            priority
             src="/unripe-plantain.svg"
             width={122}
             height={26}
@@ -33,6 +34,7 @@ const Header = () => {
         </Link>
         <DesktopNav />
         <div className="flex items-center gap-2">
+          {children}
           <SignIn className="sign-in-btn hidden w-28 md:block" />
           {/* {pathName !== "/posts" && (
             <button

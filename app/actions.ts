@@ -1,5 +1,5 @@
 "use server"
-import { signIn } from "@/auth";
+import { signIn, auth } from "@/auth";
 
 export const signInAction = async () => {
   "use server";
