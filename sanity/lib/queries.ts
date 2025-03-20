@@ -10,7 +10,7 @@ export const CATEGORIES_QUERY = defineQuery(
   `*[_type == "category" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}`
 );
 export const CAROUSEL_POSTS_QUERY = defineQuery(
-  `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]`
+  `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]`
 );
 export const SINGLE_POST_QUERY = defineQuery(
   `*[_type == "post" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]`

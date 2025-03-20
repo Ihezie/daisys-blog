@@ -17,7 +17,7 @@ const HeroCarousel = ({
   carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [play, setPlay] = useState(false);
+  const [play, setPlay] = useState(true);
   const nextSlide = () => {
     if (currentIndex === carouselData.length - 1) {
       setCurrentIndex(0);
@@ -158,7 +158,7 @@ const TextSection = ({
           <span className="text-3xl/[0px]">&#8230;</span>
           <button type="button" className="block mt-3">
             <Link
-              href=""
+              href={`/posts/${currentItemData?.slug?.current}`}
               className="hover:text-secondary group custom-transition"
             >
               read more{" "}

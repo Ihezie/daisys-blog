@@ -23,7 +23,7 @@ export const links: Link[] = [
 export const aboutBlog: AboutBlog = {
   _type: "about-blog",
   id: "blog-desc",
-  image: "/daisy/daisy-2.jpg",
+  image: "/daisy/daisy-6.jpg",
   title: "Hey stranger!",
   body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, eligendi a! Qui impedit dolore magni omnis sunt! Adipisci a placeat distinctio et necessitatibus enim quod voluptates sit, commodi earum dolor?",
   socials: [

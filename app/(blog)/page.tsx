@@ -4,6 +4,7 @@ import { client } from "@/sanity/lib/client";
 import { CATEGORIES_QUERY, CAROUSEL_POSTS_QUERY } from "@/sanity/lib/queries";
 import { aboutBlog, AboutBlog } from "../data";
 import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
+import { auth } from "@/auth";
 
 export default async function Home() {
   const categories = await client.fetch(
@@ -19,10 +20,15 @@ export default async function Home() {
     { next: { revalidate: 30 } }
   );
 
-  const carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[] = [
-    aboutBlog,
-    ...carouselPosts,
-  ];
+  const session = await auth();
+
+  let carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
+
+  if (session?.user) {
+    carouselData = carouselPosts;
+  } else {
+    carouselData = [aboutBlog, ...carouselPosts];
+  }
 
   return (
     <main className="">
