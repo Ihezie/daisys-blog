@@ -1,20 +1,18 @@
 "use client";
 
 import AnimatedHamburger from "./AnimatedHamburger";
-import { Search } from "lucide-react";
 import MobileNav from "./MobileNav";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence } from "motion/react";
 import DesktopNav from "./DesktopNav";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import SignIn from "../SignIn";
+import UserDetails from "./UserDetails";
 
-const Header = ({ children }: { children: ReactNode }) => {
+const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
   const pathName = usePathname();
-
   return (
     <>
       <header
@@ -34,16 +32,7 @@ const Header = ({ children }: { children: ReactNode }) => {
         </Link>
         <DesktopNav />
         <div className="flex items-center gap-2">
-          {children}
-          <SignIn className="sign-in-btn hidden w-28 md:block" />
-          {/* {pathName !== "/posts" && (
-            <button
-              type="button"
-              className="size-[38px] custom-transition flex items-center justify-center rounded-full hover:bg-secondary-800"
-            >
-              <Search />
-            </button>
-          )} */}
+          <UserDetails />
           <button
             className="size-[38px] flex items-center custom-transition justify-center rounded-full hover:bg-secondary-800 md:hidden"
             type="button"

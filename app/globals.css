@@ -177,7 +177,7 @@
 @layer components {
   .sign-in-btn {
     font-family: var(--font-oswald);
-    @apply text-secondary uppercase py-1 w-full text-center border-2 border-secondary rounded-full font-bold hover:bg-secondary hover:text-white max-w-[370px] mx-auto duration-150 md:px-5 md:max-w-none md:w-auto;
+    @apply text-secondary uppercase py-[2px] w-full text-center border-2 border-secondary rounded-full text-[13px] font-bold hover:bg-secondary hover:text-white max-w-[370px] mx-auto duration-150 md:px-5 md:max-w-none md:w-auto sm:text-base sm:py-1;
   }
   .sign-in-btn a {
     @apply duration-150;

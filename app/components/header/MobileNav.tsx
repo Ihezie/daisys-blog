@@ -59,7 +59,7 @@ const MobileNav = ({
         initial="hide"
         animate="show"
         exit="hide"
-        className="fixed z-40 transition-none origin-top h-[230px] w-[90%] top-[38px] rounded-[20px] bg-white pt-16 px-5 sm:w-[80%] md:hidden"
+        className="fixed z-40 transition-none origin-top h-[200px] w-[90%] top-[38px] rounded-[20px] bg-white pt-16 px-5 sm:w-[80%] md:hidden"
       >
         <ul className="flex flex-col items-center gap-3">
           {links.map(({ text, link }) => {
@@ -83,23 +83,6 @@ const MobileNav = ({
               </motion.li>
             );
           })}
-          <motion.li
-            onClick={() => {
-              setIsVisible(false);
-            }}
-            variants={children}
-            className="font-medium uppercase w-full transition-none"
-          >
-            <SignIn className="block w-full h-full" />
-            {/* <button
-              onClick={() => {
-                setIsVisible(false);
-              }}
-              className="block sign-in-btn w-full h-full"
-            >
-              <Link href="/sign-in">Sign in</Link>
-            </button> */}
-          </motion.li>
         </ul>
       </motion.nav>
       <motion.div

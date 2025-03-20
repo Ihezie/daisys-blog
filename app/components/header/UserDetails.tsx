@@ -1,23 +1,28 @@
-import { auth } from "@/auth";
-import SignIn from "../SignIn";
-import Image from "next/image";
+"use client";
 
-const UserDetails = async () => {
-  const session = await auth();
+import Avatar from "./Avatar";
+import { useState } from "react";
+import UserMenu from "./UserMenu";
+import SignIn from "../SignIn";
+import { useAuthContext } from "../AuthProvider";
+const UserDetails = () => {
+  const [showMenu, setShowMenu] = useState(false);
+  const { session } = useAuthContext();
+
   if (!session?.user)
-    return <SignIn className="sign-in-btn hidden w-28 md:block" />;
+    return <SignIn className="sign-in-btn w-[75px] md:w-28 md:block" />;
 
   return (
-    <div>
-      <div className="size-8 rounded-full overflow-hidden relative">
-        <Image
-          src={session.user.image || ""}
-          alt="User Avatar"
-          layout="fill"
-          objectFit="cover"
-        />
+    <>
+      <div
+        onClick={() => {
+          setShowMenu(!showMenu);
+        }}
+      >
+        <Avatar image={session?.user.image} showMenu={showMenu} />
       </div>
-    </div>
+      {showMenu && <UserMenu setShowMenu={setShowMenu} />}
+    </>
   );
 };
 export default UserDetails;
