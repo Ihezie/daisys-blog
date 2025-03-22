@@ -20,3 +20,12 @@ export const formatPreview = (
   }
   return "";
 };
+
+export const formatTitle = (title: string | null, length?: number) => {
+  if (title) {
+    if (title.length > 58) {
+      return title.slice(0, length || 57).trim() + "...";
+    }
+    return title;
+  }
+};

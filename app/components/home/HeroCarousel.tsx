@@ -9,7 +9,7 @@ import CarouselIndicators from "./CarouselIndicators";
 import { AboutBlog } from "@/app/data";
 import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
-import { formatDate, formatPreview } from "@/lib/utils";
+import { formatDate, formatPreview, formatTitle } from "@/lib/utils";
 
 const HeroCarousel = ({
   carouselData = [],
@@ -143,7 +143,7 @@ const TextSection = ({
 
     return (
       <article className="mt-5 lg:mt-10 lg:px-8">
-        <h1>{currentItemData.title}</h1>
+        <h1>{formatTitle(currentItemData.title, 50)}</h1>
         <div className="flex mt-5 items-center justify-between">
           <span className={`${categoryColor} py-[2px] px-3 rounded-full`}>
             {currentItemData?.category?.name}

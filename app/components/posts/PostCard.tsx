@@ -6,7 +6,7 @@ import { MoveRight } from "lucide-react";
 import type { POSTS_QUERYResult } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
 import { formatDate, formatPreview } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { formatTitle } from "@/lib/utils";
 
 type SinglePostQuery = POSTS_QUERYResult[0];
 
@@ -15,7 +15,7 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
     ? urlFor(post.image)?.width(500).height(400).url()
     : null;
   const categoryColor = post.category?.tailwindColor || "bg-purple-400";
-
+  
   return (
     <div className="w-[280px] h-[450px] mx-auto bg-white rounded-3xl custom-transition-all">
       <div className="h-[47%] overflow-hidden rounded-t-3xl hover-effect">
@@ -38,7 +38,7 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
             {formatDate(post?.publishedAt || "")}
           </span>
         </div>
-        <h3 className="text-lg capitalize mt-3">{post?.title}</h3>
+        <h3 className="text-lg capitalize mt-3">{formatTitle(post?.title)}</h3>
         <p className="mt-2 leading-tight text-slate-500">
           {Array.isArray(post.body) && formatPreview(post?.body)}
           <span className="text-3xl/[0px]">&#8230;</span>
@@ -54,3 +54,5 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
   );
 };
 export default PostCard;
+
+console.log("The Power of Fruits: A Natural Boost to Your Health".length);

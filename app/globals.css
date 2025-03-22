@@ -26,7 +26,7 @@
   h2 {
     @apply text-[27px];
   }
-  a {
+  header a, footer a {
     font-family: var(--font-oswald);
   }
   :root {
