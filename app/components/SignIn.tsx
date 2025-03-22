@@ -9,10 +9,15 @@ const SignIn = ({ className }: { className: string }) => {
     <form action={action}>
       <button
         disabled={isPending}
-        className={`${className} min-h-[27.5px] sm:min-h-9 sign-in-btn flex items-center justify-center ${isPending ? "bg-secondary" : ""}`}
+        className={`${className} min-h-[27.5px] sm:min-h-9 sign-in-btn ${isPending ? "bg-secondary" : ""}`}
       >
         {isPending ? (
-          <ThreeDots color="white" height={10} width={35} />
+          <ThreeDots
+            wrapperStyle={{ width: "35px", margin: "auto" }}
+            color="white"
+            height={10}
+            width={35}
+          />
         ) : (
           "Sign in"
         )}

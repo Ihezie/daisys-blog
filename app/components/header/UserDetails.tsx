@@ -21,7 +21,7 @@ const UserDetails = () => {
       >
         <Avatar image={session?.user.image} showMenu={showMenu} />
       </div>
-      {showMenu && <UserMenu setShowMenu={setShowMenu} />}
+      {showMenu && <UserMenu username={session?.user.name} setShowMenu={setShowMenu} />}
     </>
   );
 };

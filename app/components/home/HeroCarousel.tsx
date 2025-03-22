@@ -49,9 +49,11 @@ const HeroCarousel = ({
   if (carouselData.length === 0) {
     return <div>No Carousel Data</div>;
   }
-  if (!session?.user && currentIndex != 0) {
-    setCurrentIndex(0);
-  }
+  useEffect(() => {
+    if (!session?.user && currentIndex != 0) {
+      setCurrentIndex(0);
+    };
+  }, [session]);
 
   return (
     <section className="mt-10 bg-white p-3 pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%]">
