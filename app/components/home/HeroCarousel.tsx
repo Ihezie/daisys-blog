@@ -10,11 +10,14 @@ import { AboutBlog } from "@/app/data";
 import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
 import { formatDate, formatPreview, formatTitle } from "@/lib/utils";
+import { Session } from "next-auth";
 
 const HeroCarousel = ({
   carouselData = [],
+  session,
 }: {
   carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
+  session: Session | null;
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [play, setPlay] = useState(true);
@@ -45,6 +48,9 @@ const HeroCarousel = ({
 
   if (carouselData.length === 0) {
     return <div>No Carousel Data</div>;
+  }
+  if (!session?.user && currentIndex != 0) {
+    setCurrentIndex(0);
   }
 
   return (

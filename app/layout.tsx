@@ -21,7 +21,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${josefinSans.className} ${oswald.variable} antialiased `}
+        className={`${josefinSans.className} ${oswald.variable} antialiased`}
       >
         <AuthProvider value={{ session }}>{children}</AuthProvider>
       </body>

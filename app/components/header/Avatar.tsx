@@ -9,7 +9,7 @@ const Avatar = ({
 }) => {
   return (
     <div
-      className={`size-[38px] rounded-full overflow-hidden relative border-2 border-white hover:border-secondary cursor-pointer z-[100] ${showMenu ? "border-secondary" : ""}`}
+      className={`size-[38px] rounded-full overflow-hidden relative border-2  hover:border-secondary cursor-pointer z-[100] ${showMenu ? "border-secondary" : "border-white"}`}
     >
       <Image
         src={image || "/default-profile.jpg"}

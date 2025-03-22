@@ -32,7 +32,7 @@ export default async function Home() {
 
   return (
     <main className="">
-      <HeroCarousel carouselData={carouselData} />
+      <HeroCarousel session={session} carouselData={carouselData} />
       <CategoryCarousel categories={categories} />
     </main>
   );

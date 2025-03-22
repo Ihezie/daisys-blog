@@ -53,7 +53,7 @@ const Posts = async (props: {
       ) : (
         <div className="items-center mt-20 text-[22px] flex flex-col gap-2">
           <span className="font-semibold">No Posts Found</span>
-          <Frown size={35} color="red" />
+          <Frown size={35} />
         </div>
       )}
     </main>
