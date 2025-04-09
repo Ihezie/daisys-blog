@@ -22,6 +22,8 @@ export default async function Home() {
 
   const session = await auth();
 
+  console.log(session?.id);
+  
   let carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
 
   if (session?.user) {
@@ -29,6 +31,7 @@ export default async function Home() {
   } else {
     carouselData = [aboutBlog, ...carouselPosts];
   }
+  
 
   return (
     <main className="">

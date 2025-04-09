@@ -14,8 +14,8 @@ const Avatar = ({
       <Image
         src={image || "/default-profile.jpg"}
         alt="User Avatar"
-        layout="fill"
-        objectFit="cover"
+        fill
+        sizes="10vw"
       />
     </div>
   );

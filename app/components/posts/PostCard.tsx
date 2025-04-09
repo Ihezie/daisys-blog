@@ -54,5 +54,3 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
   );
 };
 export default PostCard;
-
-console.log("The Power of Fruits: A Natural Boost to Your Health".length);

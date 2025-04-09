@@ -68,6 +68,19 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type User = {
+  _id: string;
+  _type: "user";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  id?: number;
+  name?: string;
+  username?: string;
+  email?: string;
+  avatar?: string;
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -209,7 +222,7 @@ export type Slug = {
   source?: string;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Post | Category | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | User | Post | Category | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/lib/queries.ts
 // Variable: POSTS_QUERY
@@ -289,7 +302,7 @@ export type CATEGORIES_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: CAROUSEL_POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]
+// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]
 export type CAROUSEL_POSTS_QUERYResult = Array<{
   _type: "post";
   _id: string;
@@ -378,7 +391,7 @@ declare module "@sanity/client" {
     "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }": POSTS_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name}": CATEGORY_NAMES_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}": CATEGORIES_QUERYResult;
-    "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...4]": CAROUSEL_POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]": CAROUSEL_POSTS_QUERYResult;
     "*[_type == \"post\" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]": SINGLE_POST_QUERYResult;
   }
 }
