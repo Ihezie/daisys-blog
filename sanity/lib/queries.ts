@@ -15,7 +15,9 @@ export const CAROUSEL_POSTS_QUERY = defineQuery(
 export const SINGLE_POST_QUERY = defineQuery(
   `*[_type == "post" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]`
 );
-
 export const USER_BY_ID_QUERY = defineQuery(
   `*[_type == "user" && id == $id][0]{_id, name, avatar}`
+);
+export const COMMENTS_QUERY = defineQuery(
+  `*[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> {name, avatar}, body, likes, dislikes}`
 );

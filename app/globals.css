@@ -3,7 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @theme {
   --breakpoint-xs: 23.125rem;
 }
@@ -26,7 +25,9 @@
   h2 {
     @apply text-[27px];
   }
-  header a, footer a, li a {
+  header a,
+  footer a,
+  li a {
     font-family: var(--font-oswald);
   }
   :root {
@@ -84,14 +85,14 @@
   }
 }
 @layer utilities {
-  .custom-transition{
-    @apply transition-all duration-500
+  .custom-transition {
+    @apply transition-all duration-500;
   }
-  .custom-transition-all{
-    @apply transition-all duration-500
+  .custom-transition-all {
+    @apply transition-all duration-500;
   }
-  .custom-transition-all *{
-    @apply transition-all duration-500
+  .custom-transition-all * {
+    @apply transition-all duration-500;
   }
   .abs-center-x {
     @apply left-1/2 -translate-x-1/2;
@@ -114,10 +115,15 @@
   .open.open.can-animate span:nth-child(3) {
     animation: last-span-reverse 0.8s forwards;
   }
-  .hover-effect:hover + div p a span{
-    @apply text-secondary
+  .hover-effect:hover + div p a span {
+    @apply text-secondary;
   }
-
+  .active-decorator svg {
+    @apply text-secondary;
+  }
+  .editor-btn svg {
+    color: #374151;
+  }
   @keyframes first-span {
     0% {
       transform: translateY(0);
@@ -181,6 +187,18 @@
   }
   .sign-in-btn a {
     @apply duration-150;
+  }
+  .comment-btns button {
+    @apply flex gap-1 transition-colors hover:text-secondary;
+  }
+  .comment-btns button svg {
+    @apply size-5;
+  }
+  .comment-btns button:hover svg {
+    @apply stroke-[2.5px];
+  }
+  .comment-btns button:hover {
+    @apply font-medium;
   }
 }
 @layer base {

@@ -16,6 +16,7 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
     : null;
   const categoryColor = post.category?.tailwindColor || "bg-purple-400";
   
+  
   return (
     <div className="w-[280px] h-[450px] mx-auto bg-white rounded-3xl custom-transition-all">
       <div className="h-[47%] overflow-hidden rounded-t-3xl hover-effect">

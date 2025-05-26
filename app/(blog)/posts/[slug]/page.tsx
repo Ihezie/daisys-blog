@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { PortableText } from "next-sanity";
 import BackButton from "@/app/components/BackButton";
+import CommentSection from "@/app/components/comments/CommentSection";
 
 const myPortableTextComponents = {
   block: {
@@ -59,6 +60,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
           )}
         </article>
       </section>
+      <CommentSection postId={post?._id}/>
     </main>
   );
 };

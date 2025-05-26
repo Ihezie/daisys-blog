@@ -18,7 +18,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        "font-oswald": "fon",
+        "oswald": ['var(--font-oswald)'],
+        "josefin-sans": ['var(--font-josefin-sans)'],
       },
       screens: {
         xs: "450px",

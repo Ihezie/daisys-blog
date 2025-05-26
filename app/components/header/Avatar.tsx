@@ -12,7 +12,7 @@ const Avatar = ({
       className={`size-[38px] rounded-full overflow-hidden relative border-2  hover:border-secondary cursor-pointer z-[100] ${showMenu ? "border-secondary" : "border-white"}`}
     >
       <Image
-        src={image || "/default-profile.jpg"}
+        src={image || "/default-avatar.jpg"}
         alt="User Avatar"
         fill
         sizes="10vw"
