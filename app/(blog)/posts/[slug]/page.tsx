@@ -8,6 +8,10 @@ import Image from "next/image";
 import { PortableText } from "next-sanity";
 import BackButton from "@/app/components/BackButton";
 import CommentSection from "@/app/components/comments/CommentSection";
+import { COMMENTS_QUERY } from "@/sanity/lib/queries";
+import { COMMENTS_QUERYResult } from "@/sanity.types";
+import { sanityFetch } from "@/sanity/lib/live";
+import { auth } from "@/auth";
 
 const myPortableTextComponents = {
   block: {
@@ -15,6 +19,10 @@ const myPortableTextComponents = {
     h2: ({ children, node }: any) => <h2 id={node._key}>{children}</h2>,
     h3: ({ children, node }: any) => <h3 id={node._key}>{children}</h3>,
   },
+};
+
+export type COMMENT = COMMENTS_QUERYResult[0] & {
+  sending?: boolean;
 };
 
 const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
@@ -29,9 +37,16 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
     : null;
 
   const categoryColor = post?.category?.tailwindColor || "bg-purple-400";
+
+  // fetch comments
+  let { data: comments }: { data: Array<COMMENT> } = await sanityFetch({
+    query: COMMENTS_QUERY,
+    params: { postId: post?._id },
+  });
+  const session = await auth();
   return (
     <main className="pt-6">
-      <BackButton/>
+      <BackButton />
       <div className="flex justify-center items-center gap-4">
         <span
           className={`py-[2px] px-3 rounded-full ${categoryColor} capitalize`}
@@ -60,7 +75,11 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
           )}
         </article>
       </section>
-      <CommentSection postId={post?._id}/>
+      <CommentSection
+        session={session}
+        rawComments={comments}
+        postId={post?._id}
+      />
     </main>
   );
 };

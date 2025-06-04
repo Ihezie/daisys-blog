@@ -34,3 +34,5 @@ export const postComment = async (
     });
   }
 };
+
+// writeClient.delete({query: '*[_type == "comment"]'})

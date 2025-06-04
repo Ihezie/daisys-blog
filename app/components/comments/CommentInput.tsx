@@ -25,7 +25,8 @@ import {
 } from "lucide-react";
 import * as selectors from "@portabletext/editor/selectors";
 import { postComment } from "@/app/actions";
-
+import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
+import { Session } from "next-auth";
 // ...
 const schemaDefinition = defineSchema({
   // Decorators are simple marks that don't hold any data
@@ -53,7 +54,15 @@ const schemaDefinition = defineSchema({
   blockObjects: [],
 });
 
-const CommentInput = ({postId} : {postId: string | undefined}) => {
+const CommentInput = ({
+  postId,
+  addOptimisticComment,
+  session,
+}: {
+  postId: string | undefined;
+  addOptimisticComment: (action: COMMENT) => void;
+  session: Session | null;
+}) => {
   const [value, setValue] = useState<Array<PortableTextBlock> | undefined>(
     undefined
   );
@@ -87,40 +96,66 @@ const CommentInput = ({postId} : {postId: string | undefined}) => {
     return <>{props.children}</>;
   };
 
-  return (
-    <EditorProvider initialConfig={{ schemaDefinition, initialValue: value }}>
-      <div className="bg-white rounded-xl p-[10px] focus-within:shadow-xl shadow-black transition-shadow sm:p-3">
-        <EventListenerPlugin
-          on={(event) => {
-            if (event.type === "mutation") {
-              setValue(event.value);
-            }
-          }}
-        />
-        <PortableTextEditable
-          placeholder="Add a comment"
-          renderStyle={renderStyle}
-          renderDecorator={renderDecorator}
-          renderBlock={(props) => <div>{props.children}</div>}
-          renderListItem={(props) => <>{props.children}</>}
-          className="mb-6 outline-none"
-        />
-        <div className="flex flex-col items-center xs:flex-row xs:justify-between">
-          <Toolbar />
+  const handlePost = async (
+    value: Array<PortableTextBlock> | undefined,
+    postId: string | undefined
+  ) => {
+    const comment = {
+      _id: "temp_id",
+      publishedAt: "posting...",
+      user: {
+        _id: "temp_id",
+        name: session?.user?.name as string | null,
+        avatar: session?.user?.image as string | null,
+      },
+      //temporary
+      body: value as any,
+      likes: 0,
+      dislikes: 0,
+      sending: true,
+    };
+    addOptimisticComment(comment);
 
-          {/* Input post logic */}
-          <button
-            className="border-2 border-secondary px-4 pt-[2px] rounded-full text-secondary font-bold mt-3 transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:mt-0"
-            type="submit"
-            onClick={() => {
-              postComment(value, postId);
+    await postComment(value, postId);
+  };
+
+  return (
+    <form
+      action={() => {
+        handlePost(value, postId);
+      }}
+    >
+      <EditorProvider initialConfig={{ schemaDefinition, initialValue: value }}>
+        <div className="bg-white rounded-xl p-[10px] focus-within:shadow-xl shadow-black transition-shadow sm:p-3">
+          <EventListenerPlugin
+            on={(event) => {
+              if (event.type === "mutation") {
+                setValue(event.value);
+              }
             }}
-          >
-            Post
-          </button>
+          />
+          <PortableTextEditable
+            placeholder="Add a comment"
+            renderStyle={renderStyle}
+            renderDecorator={renderDecorator}
+            renderBlock={(props) => <div>{props.children}</div>}
+            renderListItem={(props) => <>{props.children}</>}
+            className="mb-6 outline-none"
+          />
+          <div className="flex flex-col items-center xs:flex-row xs:justify-between">
+            <Toolbar />
+
+            {/* Ensure empty comments cannot be submitted */}
+            <button
+              className="border-2 border-secondary px-4 pt-[2px] rounded-full text-secondary font-bold mt-3 transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:mt-0"
+              type="submit"
+            >
+              Post
+            </button>
+          </div>
         </div>
-      </div>
-    </EditorProvider>
+      </EditorProvider>
+    </form>
   );
 };
 export default CommentInput;

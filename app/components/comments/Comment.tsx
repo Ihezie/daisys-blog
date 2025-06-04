@@ -13,13 +13,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { COMMENTS_QUERYResult } from "@/sanity.types";
 import { PortableText } from "next-sanity";
 import { DateTime } from "ts-luxon";
+import { Session } from "next-auth";
+import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 
-const Comment = ({ comment }: { comment: COMMENTS_QUERYResult[0] }) => {
+const Comment = ({
+  comment,
+  session,
+}: {
+  comment: COMMENT;
+  session: Session | null;
+}) => {
   const timestamp = (date: string | null) => {
     if (date) {
+      if (date === "posting...") {
+        return date;
+      }
       const posted = DateTime.fromISO(date);
       const current = DateTime.now();
       const diff = current.diff(posted, [
@@ -39,10 +49,10 @@ const Comment = ({ comment }: { comment: COMMENTS_QUERYResult[0] }) => {
       return `${timeSince} ${maxUnitStr} ago`;
     }
   };
-
+  const ownsComment = session?.id === comment.user?._id;
   return (
-    <article>
-      <header className="flex items-center gap-3">
+    <article className={comment.sending ? "[&_*]:opacity-60" : ""}>
+      <header className={"flex !opacity-100 items-center gap-3"}>
         <div
           className={`size-[38px] rounded-full overflow-hidden relative border-2  hover:border-secondary cursor-pointer z-[100]"}`}
         >
@@ -54,14 +64,16 @@ const Comment = ({ comment }: { comment: COMMENTS_QUERYResult[0] }) => {
           />
         </div>
         <h3>{comment?.user?.name}</h3>
-        <span className="mt-1 text-black/60">
+        <span
+          className={`mt-1 !opacity-100 text-sm md:text-[15px] ${comment?.publishedAt === "posting..." ? "text-secondary" : "text-black/60"}`}
+        >
           {timestamp(comment?.publishedAt)}
         </span>
       </header>
       <div className="ml-[50px] mt-1 prose">
         {Array.isArray(comment?.body) && <PortableText value={comment.body} />}
       </div>
-      <div className="ml-[50px] mt-5 flex justify-between items-center">
+      <div className="ml-[50px] mt-1 flex justify-between items-center">
         <div className="flex gap-5 comment-btns">
           <button type="button">
             <ThumbsUp />
@@ -75,19 +87,21 @@ const Comment = ({ comment }: { comment: COMMENTS_QUERYResult[0] }) => {
             <MessageSquareText /> Reply
           </button>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="hover:text-secondary transition-colors outline-none focus:text-secondary">
-            <Ellipsis />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-20 mr-5 sm:mr-16">
-            <DropdownMenuItem>
-              <Pencil /> <span className="mt-[1px]">Edit</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash2 /> <span className="mt-[1px]">Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {ownsComment && (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="hover:text-secondary transition-colors outline-none focus:text-secondary">
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="min-w-20 mr-5 sm:mr-16">
+              <DropdownMenuItem>
+                <Pencil /> <span className="mt-[1px]">Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Trash2 /> <span className="mt-[1px]">Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </article>
   );

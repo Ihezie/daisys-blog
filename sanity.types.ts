@@ -439,11 +439,12 @@ export type USER_BY_ID_QUERYResult = {
   avatar: string | null;
 } | null;
 // Variable: COMMENTS_QUERY
-// Query: *[_type == "comment" && post._ref == $postId]{_id, publishedAt, user -> {name, avatar}, body, likes, dislikes}
+// Query: *[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, body, likes, dislikes}
 export type COMMENTS_QUERYResult = Array<{
   _id: string;
   publishedAt: string | null;
   user: {
+    _id: string;
     name: string | null;
     avatar: string | null;
   } | null;
@@ -479,6 +480,9 @@ declare module "@sanity/client" {
     "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]": CAROUSEL_POSTS_QUERYResult;
     "*[_type == \"post\" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]": SINGLE_POST_QUERYResult;
     "*[_type == \"user\" && id == $id][0]{_id, name, avatar}": USER_BY_ID_QUERYResult;
-    "*[_type == \"comment\" && post._ref == $postId]{_id, publishedAt, user -> {name, avatar}, body, likes, dislikes}": COMMENTS_QUERYResult;
+    "*[_type == \"comment\" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, body, likes, dislikes}": COMMENTS_QUERYResult;
   }
 }
+
+
+
