@@ -5,6 +5,7 @@ import Comment from "./Comment";
 import { useOptimistic } from "react";
 import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 import { Session } from "next-auth";
+import { comment } from "postcss";
 
 const CommentSection = ({
   rawComments,
@@ -24,6 +25,7 @@ const CommentSection = ({
     //properly type this
     (state, newComment: any) => [newComment, ...state]
   );
+  
 
   return (
     <section className="mt-20">
@@ -32,7 +34,7 @@ const CommentSection = ({
         postId={postId}
         session={session}
       />
-      <section className="mt-8 border-t border-black/30 pt-12">
+      <section className="mt-5 border-t border-black/30 pt-12">
         <header className="flex justify-between items-center">
           <h2
             className="text-xl

@@ -17,6 +17,12 @@ import { PortableText } from "next-sanity";
 import { DateTime } from "ts-luxon";
 import { Session } from "next-auth";
 import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
+import {
+  dislikeCommentAction,
+  likeCommentAction,
+  deleteCommentAction,
+} from "@/app/actions";
+import { useTransition } from "react";
 
 const Comment = ({
   comment,
@@ -50,8 +56,12 @@ const Comment = ({
     }
   };
   const ownsComment = session?.id === comment.user?._id;
+
+  const [approvalIsPending, startApprovalTransition] = useTransition();
+  const [deleteIsPending, startDeleteTransition] = useTransition();
+
   return (
-    <article className={comment.sending ? "[&_*]:opacity-60" : ""}>
+    <article className={comment.sending || deleteIsPending ? "[&_*]:opacity-50 pointer-events-none" : ""}>
       <header className={"flex !opacity-100 items-center gap-3"}>
         <div
           className={`size-[38px] rounded-full overflow-hidden relative border-2  hover:border-secondary cursor-pointer z-[100]"}`}
@@ -75,13 +85,39 @@ const Comment = ({
       </div>
       <div className="ml-[50px] mt-1 flex justify-between items-center">
         <div className="flex gap-5 comment-btns">
-          <button type="button">
+          <button
+            className={`${approvalIsPending ? "opacity-25" : ""}`}
+            disabled={approvalIsPending}
+            type="button"
+            onClick={() => {
+              startApprovalTransition(async () => {
+                await likeCommentAction(
+                  comment._id,
+                  comment.likes,
+                  comment.dislikes
+                );
+              });
+            }}
+          >
             <ThumbsUp />
-            {comment.likes}
+            {comment.likes?.length}
           </button>
-          <button type="button">
+          <button
+            className={`${approvalIsPending ? "opacity-30" : ""}`}
+            disabled={approvalIsPending}
+            type="button"
+            onClick={() => {
+              startApprovalTransition(async () => {
+                await dislikeCommentAction(
+                  comment._id,
+                  comment.likes,
+                  comment.dislikes
+                );
+              });
+            }}
+          >
             <ThumbsDown />
-            {comment.dislikes}
+            {comment.dislikes?.length}
           </button>
           <button type="button">
             <MessageSquareText /> Reply
@@ -96,7 +132,13 @@ const Comment = ({
               <DropdownMenuItem>
                 <Pencil /> <span className="mt-[1px]">Edit</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  startDeleteTransition(async () => {
+                    await deleteCommentAction(comment._id);
+                  });
+                }}
+              >
                 <Trash2 /> <span className="mt-[1px]">Delete</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

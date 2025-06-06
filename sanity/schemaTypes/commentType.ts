@@ -4,12 +4,11 @@ export const commentType = defineType({
   name: "comment",
   title: "Comment",
   type: "document",
-  readOnly: true,
+  // readOnly: true,
   fields: [
     defineField({
       name: "publishedAt",
       type: "datetime",
-
     }),
     defineField({
       name: "user",
@@ -28,11 +27,17 @@ export const commentType = defineType({
     }),
     defineField({
       name: "likes",
-      type: "number",
+      type: "array",
+      validation: (rule) => rule.unique(),
+      of: [{ type: "reference", to: { type: "user" } }],
+      initialValue: [],
     }),
     defineField({
       name: "dislikes",
-      type: "number",
+      type: "array",
+      validation: (rule) => rule.unique(),
+      of: [{ type: "reference", to: { type: "user" } }],
+      initialValue: [],
     }),
   ],
 });

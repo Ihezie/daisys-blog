@@ -105,8 +105,20 @@ export type Comment = {
     _type: "block";
     _key: string;
   }>;
-  likes?: number;
-  dislikes?: number;
+  likes?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }>;
+  dislikes?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }>;
 };
 
 export type User = {
@@ -466,8 +478,20 @@ export type COMMENTS_QUERYResult = Array<{
     _type: "block";
     _key: string;
   }> | null;
-  likes: number | null;
-  dislikes: number | null;
+  likes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null;
+  dislikes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null;
 }>;
 
 // Query TypeMap
@@ -483,6 +507,3 @@ declare module "@sanity/client" {
     "*[_type == \"comment\" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, body, likes, dislikes}": COMMENTS_QUERYResult;
   }
 }
-
-
-

@@ -2,6 +2,7 @@
 import { signIn, auth, signOut } from "@/auth";
 import { writeClient } from "@/sanity/lib/write-client";
 import type { PortableTextBlock } from "@portabletext/editor";
+import { internalGroqTypeReferenceTo } from "@/sanity.types";
 
 export const signInAction = async () => {
   // "use server";
@@ -29,10 +30,108 @@ export const postComment = async (
         _ref: postId,
       },
       body: value,
-      likes: 0,
-      dislikes: 0,
+      likes: [],
+      dislikes: [],
     });
   }
 };
+
+export const likeCommentAction = async (
+  documentId: string,
+  likes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null,
+  dislikes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null
+) => {
+  const ref = (await auth())?.id;
+  const hasLiked = likes?.some((user) => user._ref === ref);
+  const hasDisliked = dislikes?.some((user) => user._ref === ref);
+
+  if (hasDisliked) {
+    await writeClient
+      .patch(documentId)
+      .unset([`dislikes[_ref=="${ref}"]`])
+      .commit();
+  }
+  if (!hasLiked) {
+    await writeClient
+      .patch(documentId)
+      .setIfMissing({ likes: [] })
+      .insert("after", "likes[-1]", [
+        {
+          _type: "reference",
+          _ref: ref,
+        },
+      ])
+      .commit({
+        autoGenerateArrayKeys: true,
+      });
+  } else {
+    await writeClient
+      .patch(documentId)
+      .unset([`likes[_ref=="${ref}"]`])
+      .commit();
+  }
+};
+export const dislikeCommentAction = async (
+  documentId: string,
+  likes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null,
+  dislikes: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }> | null
+) => {
+  const ref = (await auth())?.id;
+  const hasLiked = likes?.some((user) => user._ref === ref);
+  const hasDisliked = dislikes?.some((user) => user._ref === ref);
+  if (hasLiked) {
+    await writeClient
+      .patch(documentId)
+      .unset([`likes[_ref=="${ref}"]`])
+      .commit();
+  }
+  if (!hasDisliked) {
+    await writeClient
+      .patch(documentId)
+      .setIfMissing({ dislikes: [] })
+      .insert("after", "dislikes[-1]", [
+        {
+          _type: "reference",
+          _ref: ref,
+        },
+      ])
+      .commit({
+        autoGenerateArrayKeys: true,
+      });
+  } else {
+    await writeClient
+      .patch(documentId)
+      .unset([`dislikes[_ref=="${ref}"]`])
+      .commit();
+  }
+};
+
+export const deleteCommentAction = async (id: string)=>{
+  await writeClient.delete(id)
+}
 
 // writeClient.delete({query: '*[_type == "comment"]'})

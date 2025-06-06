@@ -96,66 +96,100 @@ const CommentInput = ({
     return <>{props.children}</>;
   };
 
+  const [formError, setFormError] = useState(false);
   const handlePost = async (
     value: Array<PortableTextBlock> | undefined,
     postId: string | undefined
   ) => {
-    const comment = {
-      _id: "temp_id",
-      publishedAt: "posting...",
-      user: {
-        _id: "temp_id",
-        name: session?.user?.name as string | null,
-        avatar: session?.user?.image as string | null,
-      },
-      //temporary
-      body: value as any,
-      likes: 0,
-      dislikes: 0,
-      sending: true,
-    };
-    addOptimisticComment(comment);
-
-    await postComment(value, postId);
+    const isEmpty =
+      !Array.isArray(value) ||
+      value.every(
+        (block) =>
+          block._type !== "block" ||
+          !Array.isArray(block.children) ||
+          block.children.every((child: any) => !child.text?.trim())
+      );
+    if (session) {
+      if (!isEmpty) {
+        setFormError(false);
+        const comment = {
+          _id: "temp_id",
+          publishedAt: "posting...",
+          user: {
+            _id: "temp_id",
+            name: session?.user?.name as string | null,
+            avatar: session?.user?.image as string | null,
+          },
+          //temporary
+          body: value as any,
+          likes: [],
+          dislikes: [],
+          sending: true,
+        };
+        addOptimisticComment(comment);
+        await postComment(value, postId);
+        // setValue([]);
+      } else {
+        setFormError(true);
+      }
+    }
   };
 
   return (
-    <form
-      action={() => {
-        handlePost(value, postId);
-      }}
-    >
-      <EditorProvider initialConfig={{ schemaDefinition, initialValue: value }}>
-        <div className="bg-white rounded-xl p-[10px] focus-within:shadow-xl shadow-black transition-shadow sm:p-3">
-          <EventListenerPlugin
-            on={(event) => {
-              if (event.type === "mutation") {
-                setValue(event.value);
-              }
-            }}
-          />
-          <PortableTextEditable
-            placeholder="Add a comment"
-            renderStyle={renderStyle}
-            renderDecorator={renderDecorator}
-            renderBlock={(props) => <div>{props.children}</div>}
-            renderListItem={(props) => <>{props.children}</>}
-            className="mb-6 outline-none"
-          />
-          <div className="flex flex-col items-center xs:flex-row xs:justify-between">
-            <Toolbar />
+    <>
+      <form
+        className={
+          !session ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
+        }
+        action={() => {
+          handlePost(value, postId);
+        }}
+      >
+        <EditorProvider
+          initialConfig={{ schemaDefinition, initialValue: value }}
+        >
+          <div className="bg-white rounded-xl p-[10px] focus-within:shadow-xl shadow-black transition-shadow sm:p-3">
+            <EventListenerPlugin
+              on={(event) => {
+                if (event.type === "mutation") {
+                  setValue(event.value);
+                }
+              }}
+            />
+            <PortableTextEditable
+              placeholder="Add a comment"
+              renderStyle={renderStyle}
+              renderDecorator={renderDecorator}
+              renderBlock={(props) => <div>{props.children}</div>}
+              renderListItem={(props) => <>{props.children}</>}
+              className="mb-6 outline-none"
+            />
+            <div className="flex flex-col items-center xs:flex-row xs:justify-between">
+              <Toolbar />
 
-            {/* Ensure empty comments cannot be submitted */}
-            <button
-              className="border-2 border-secondary px-4 pt-[2px] rounded-full text-secondary font-bold mt-3 transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:mt-0"
-              type="submit"
-            >
-              Post
-            </button>
+              {/* Ensure empty comments cannot be submitted */}
+              <button
+                disabled={!session}
+                className="border-2 border-secondary px-4 pt-[2px] rounded-full text-secondary font-bold mt-3 transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:mt-0"
+                type="submit"
+              >
+                Post
+              </button>
+            </div>
           </div>
-        </div>
-      </EditorProvider>
-    </form>
+        </EditorProvider>
+      </form>
+      {!session && (
+        <p className="mt-7 font-medium font-oswald text-center text-secondary">
+          Please sign in to post a comment
+        </p>
+      )}
+      {formError && (
+        <p className="mt-7 font-medium font-oswald text-center text-secondary">
+          Please enter a valid comment
+        </p>
+      )}
+    </>
   );
 };
 export default CommentInput;
@@ -183,6 +217,7 @@ function Toolbar() {
     return (
       <button
         key={style.name}
+        type="button"
         onClick={() => {
           // Send style toggle event
           editor.send({ type: "style.toggle", style: style.name });
@@ -202,6 +237,7 @@ function Toolbar() {
     return (
       <button
         key={decorator.name}
+        type="button"
         onClick={() => {
           // Send decorator toggle event
           editor.send({ type: "decorator.toggle", decorator: decorator.name });
