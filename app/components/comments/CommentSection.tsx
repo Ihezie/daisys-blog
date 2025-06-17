@@ -1,11 +1,10 @@
 "use client";
 
-import CommentInput from "@/app/components/comments/CommentInput";
+import CustomInput from "@/app/components/comments/CustomInput";
 import Comment from "./Comment";
-import { useOptimistic } from "react";
+import { useOptimistic, useState } from "react";
 import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 import { Session } from "next-auth";
-import { comment } from "postcss";
 
 const CommentSection = ({
   rawComments,
@@ -25,14 +24,14 @@ const CommentSection = ({
     //properly type this
     (state, newComment: any) => [newComment, ...state]
   );
-  
-
+  const [showReplyInput, setShowReplyInput] = useState<string | false>(false);
   return (
     <section className="mt-20">
-      <CommentInput
+      <CustomInput
         addOptimisticComment={addOptimisticComment}
         postId={postId}
         session={session}
+        type="comment"
       />
       <section className="mt-5 border-t border-black/30 pt-12">
         <header className="flex justify-between items-center">
@@ -48,8 +47,15 @@ const CommentSection = ({
           <div>Most recent</div>
         </header>
         <section className="mt-5">
+          {/* Need to formulate a groq query for replies */}
           {optimisticComments.map((comment) => (
-            <Comment session={session} comment={comment} key={comment._id} />
+            <Comment
+              setShowReplyInput={setShowReplyInput}
+              showReplyInput={showReplyInput}
+              session={session}
+              comment={comment}
+              key={comment._id}
+            />
           ))}
         </section>
       </section>

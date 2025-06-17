@@ -39,5 +39,10 @@ export const commentType = defineType({
       of: [{ type: "reference", to: { type: "user" } }],
       initialValue: [],
     }),
+    defineField({
+      name: "replies",
+      type: "array",
+      of: [{ type: "reference", to: { type: "reply" } }],
+    }),
   ],
 });

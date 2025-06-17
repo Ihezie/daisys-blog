@@ -13,9 +13,9 @@ import { COMMENTS_QUERYResult } from "@/sanity.types";
 import { sanityFetch } from "@/sanity/lib/live";
 import { auth } from "@/auth";
 
-const myPortableTextComponents = {
+const myPortableTextComponents = {   
   block: {
-    h1: ({ children, node }: any) => <h1 id={node._key}>{children}</h1>,
+    h1: ({ children, node }: any) => <h1 id={node._key}>{children}</h1>,  
     h2: ({ children, node }: any) => <h2 id={node._key}>{children}</h2>,
     h3: ({ children, node }: any) => <h3 id={node._key}>{children}</h3>,
   },

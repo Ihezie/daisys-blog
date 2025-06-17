@@ -3,6 +3,7 @@ import { josefinSans, oswald } from "./fonts";
 import "./globals.css";
 import { auth } from "@/auth";
 import AuthProvider from "./components/AuthProvider";
+import { Toaster } from "./components/ui/sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +25,7 @@ export default async function RootLayout({
         className={`${josefinSans.className} ${oswald.variable} antialiased`}
       >
         <AuthProvider value={{ session }}>{children}</AuthProvider>
+        <Toaster className="" />
       </body>
     </html>
   );

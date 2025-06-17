@@ -3,6 +3,9 @@ import { signIn, auth, signOut } from "@/auth";
 import { writeClient } from "@/sanity/lib/write-client";
 import type { PortableTextBlock } from "@portabletext/editor";
 import { internalGroqTypeReferenceTo } from "@/sanity.types";
+import { REPLIES_QUERY } from "@/sanity/lib/queries";
+import { REPLIES_QUERYResult } from "@/sanity.types";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const signInAction = async () => {
   // "use server";
@@ -130,8 +133,19 @@ export const dislikeCommentAction = async (
   }
 };
 
-export const deleteCommentAction = async (id: string)=>{
-  await writeClient.delete(id)
-}
+export const deleteCommentAction = async (id: string) => {
+  await writeClient.delete(id);
+};
+
+export const getRepliesAction = async (
+  commentId: string
+): Promise<REPLIES_QUERYResult> => {
+  const replies = await sanityFetch({
+    query: REPLIES_QUERY,
+    params: { commentId },
+  });
+
+  return replies.data;
+};
 
 // writeClient.delete({query: '*[_type == "comment"]'})

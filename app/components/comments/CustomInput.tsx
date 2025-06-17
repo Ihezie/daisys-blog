@@ -54,14 +54,20 @@ const schemaDefinition = defineSchema({
   blockObjects: [],
 });
 
-const CommentInput = ({
+const CustomInput = ({
   postId,
+  commentId,
   addOptimisticComment,
+  addOptimisticReply,
   session,
+  type = "comment",
 }: {
   postId: string | undefined;
-  addOptimisticComment: (action: COMMENT) => void;
+  commentId?: string | undefined;
+  addOptimisticComment?: (action: COMMENT) => void;
+  addOptimisticReply?: (action: any) => void;
   session: Session | null;
+  type: "comment" | "reply";
 }) => {
   const [value, setValue] = useState<Array<PortableTextBlock> | undefined>(
     undefined
@@ -95,13 +101,12 @@ const CommentInput = ({
     }
     return <>{props.children}</>;
   };
-
   const [formError, setFormError] = useState(false);
-  const handlePost = async (
-    value: Array<PortableTextBlock> | undefined,
-    postId: string | undefined
-  ) => {
-    const isEmpty =
+
+  const checkIfEmpty = (
+    value: Array<PortableTextBlock> | undefined
+  ): boolean => {
+    const result =
       !Array.isArray(value) ||
       value.every(
         (block) =>
@@ -109,6 +114,15 @@ const CommentInput = ({
           !Array.isArray(block.children) ||
           block.children.every((child: any) => !child.text?.trim())
       );
+
+    return result;
+  };
+  const handlePost = async (
+    value: Array<PortableTextBlock> | undefined,
+    postId: string | undefined
+  ) => {
+    const isEmpty = checkIfEmpty(value);
+
     if (session) {
       if (!isEmpty) {
         setFormError(false);
@@ -121,14 +135,26 @@ const CommentInput = ({
             avatar: session?.user?.image as string | null,
           },
           //temporary
+          post: {
+            _id: postId as string,
+          },
           body: value as any,
           likes: [],
           dislikes: [],
           sending: true,
         };
-        addOptimisticComment(comment);
-        await postComment(value, postId);
-        // setValue([]);
+        if (type === "reply") {
+          const reply = {
+            ...comment,
+            comment: {},
+            //input comment shit
+          };
+          addOptimisticReply && addOptimisticReply(reply);
+          // await postReply(value, commentId, postId)
+        } else {
+          addOptimisticComment && addOptimisticComment(comment);
+          await postComment(value, postId);
+        }
       } else {
         setFormError(true);
       }
@@ -139,7 +165,9 @@ const CommentInput = ({
     <>
       <form
         className={
-          !session ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
+          !session
+            ? "opacity-50 pointer-events-none cursor-not-allowed"
+            : "flex-grow"
         }
         action={() => {
           handlePost(value, postId);
@@ -148,7 +176,9 @@ const CommentInput = ({
         <EditorProvider
           initialConfig={{ schemaDefinition, initialValue: value }}
         >
-          <div className="bg-white rounded-xl p-[10px] focus-within:shadow-xl shadow-black transition-shadow sm:p-3">
+          <div
+            className={`bg-white rounded-xl ${type === "reply" ? "p-[5px]" : "p-[10px]"}  focus-within:shadow-xl shadow-black transition-shadow text-sm xs:p-3 xs:text-base`}
+          >
             <EventListenerPlugin
               on={(event) => {
                 if (event.type === "mutation") {
@@ -162,15 +192,13 @@ const CommentInput = ({
               renderDecorator={renderDecorator}
               renderBlock={(props) => <div>{props.children}</div>}
               renderListItem={(props) => <>{props.children}</>}
-              className="mb-6 outline-none"
+              className="mb-4 outline-none break-all"
             />
-            <div className="flex flex-col items-center xs:flex-row xs:justify-between">
-              <Toolbar />
-
-              {/* Ensure empty comments cannot be submitted */}
+            <div className="flex items-center flex-row justify-between">
+              <Toolbar type={type} />
               <button
                 disabled={!session}
-                className="border-2 border-secondary px-4 pt-[2px] rounded-full text-secondary font-bold mt-3 transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:mt-0"
+                className={`${type === "reply" ? "text-xs px-[7px]" : "px-[10px]"} border-2 border-secondary text-sm  pt-[2px] rounded-full  text-secondary font-bold transition-colors duration-300 hover:bg-secondary hover:text-white self-end xs:text-base xs:px-[10px]`}
                 type="submit"
               >
                 Post
@@ -192,20 +220,37 @@ const CommentInput = ({
     </>
   );
 };
-export default CommentInput;
+export default CustomInput;
 
-function Toolbar() {
+function Toolbar({ type = "comment" }: { type: "comment" | "reply" }) {
   const styleIcons = {
     normal: <ALargeSmall />,
-    h1: <Heading1 />,
-    h2: <Heading2 />,
-    h3: <Heading3 />,
-    blockquote: <Quote strokeWidth="2.2" className="size-[18px]" />,
+    h1: (
+      <Heading1
+        className={`${type === "reply" ? "size-[18px]" : "size-[20px]"} xs:size-auto`}
+      />
+    ),
+    h2: (
+      <Heading2
+        className={`${type === "reply" ? "size-[18px]" : "size-[20px]"} xs:size-auto`}
+      />
+    ),
+    h3: (
+      <Heading3
+        className={`${type === "reply" ? "size-[18px]" : "size-[20px]"} xs:size-auto`}
+      />
+    ),
+
+    blockquote: (
+      <Quote strokeWidth="2.2" className={`${type === "reply" ? "size-[13px]" : "size-[15px]"} xs:size-[18px]`} />
+    ),
   };
   const decoratorIcons = {
-    strong: <Bold strokeWidth={2.6} className="size-[18px]" />,
-    em: <Italic strokeWidth={2.6} className="size-[18px]" />,
-    underline: <Underline strokeWidth={2.5} className="size-[21px]" />,
+    strong: <Bold strokeWidth={2.6} className="size-[14px] xs:size-[18px]" />,
+    em: <Italic strokeWidth={2.6} className="size-[14px] xs:size-[18px]" />,
+    underline: (
+      <Underline strokeWidth={2.5} className="size-[16px] xs:size-[21px]" />
+    ),
   };
   // useEditor provides access to the PTE
   const editor = useEditor();
@@ -251,7 +296,7 @@ function Toolbar() {
   });
 
   return (
-    <div className="flex justify-between w-full xs:w-auto xs:gap-3">
+    <div className="flex justify-between w-[77%] xs:w-auto xs:gap-[6px] sm:gap-3">
       {styleButtons}
       <div className="border-r-black/30 bg-black/30 border"></div>
       {decoratorButtons}

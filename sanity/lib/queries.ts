@@ -19,5 +19,8 @@ export const USER_BY_ID_QUERY = defineQuery(
   `*[_type == "user" && id == $id][0]{_id, name, avatar}`
 );
 export const COMMENTS_QUERY = defineQuery(
-  `*[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, body, likes, dislikes}`
+  `*[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}`
+);
+export const REPLIES_QUERY = defineQuery(
+  `*[_type == "reply" && comment._ref == $commentId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}`
 );

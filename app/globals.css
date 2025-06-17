@@ -191,13 +191,16 @@
   .comment-btns button {
     @apply flex gap-1 transition-colors hover:text-secondary;
   }
+  .comment-btns .active{
+    @apply text-secondary
+  }
   .comment-btns button svg {
     @apply size-5;
   }
-  .comment-btns button:hover svg {
+  .comment-btns button:hover svg, .comment-btns .active svg {
     @apply stroke-[2.5px];
   }
-  .comment-btns button:hover {
+  .comment-btns button:hover, .comment-btns .active {
     @apply font-medium;
   }
 }
