@@ -43,6 +43,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
     query: COMMENTS_QUERY,
     params: { postId: post?._id },
   });
+  
   const session = await auth();
   return (
     <main className="pt-6">

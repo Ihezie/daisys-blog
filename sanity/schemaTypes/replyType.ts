@@ -4,7 +4,7 @@ export const replyType = defineType({
   name: "reply",
   title: "Reply",
   type: "document",
-  // readOnly: true,
+  readOnly: true,
   fields: [
     defineField({
       name: "publishedAt",

@@ -11,7 +11,7 @@ import type {
   RenderStyleFunction,
 } from "@portabletext/editor";
 import { EventListenerPlugin } from "@portabletext/editor/plugins";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { useEditor, useEditorSelector } from "@portabletext/editor";
 import {
   ALargeSmall,
@@ -24,9 +24,12 @@ import {
   Underline,
 } from "lucide-react";
 import * as selectors from "@portabletext/editor/selectors";
-import { postComment } from "@/app/actions";
+import { postComment, postReply } from "@/app/actions";
 import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 import { Session } from "next-auth";
+import { uuid } from "@sanity/uuid";
+import { COMMENTS_QUERYResult, REPLIES_QUERYResult } from "@/sanity.types";
+import { Dispatch } from "react";
 // ...
 const schemaDefinition = defineSchema({
   // Decorators are simple marks that don't hold any data
@@ -61,6 +64,8 @@ const CustomInput = ({
   addOptimisticReply,
   session,
   type = "comment",
+  setReplies,
+  setComments,
 }: {
   postId: string | undefined;
   commentId?: string | undefined;
@@ -68,11 +73,12 @@ const CustomInput = ({
   addOptimisticReply?: (action: any) => void;
   session: Session | null;
   type: "comment" | "reply";
+  setReplies?: Dispatch<SetStateAction<[] | REPLIES_QUERYResult>>;
+  setComments?: Dispatch<SetStateAction<[] | COMMENTS_QUERYResult>>;
 }) => {
   const [value, setValue] = useState<Array<PortableTextBlock> | undefined>(
     undefined
   );
-
   const renderStyle: RenderStyleFunction = (props) => {
     if (props.schemaType.value === "h1") {
       return <h1>{props.children}</h1>;
@@ -88,7 +94,6 @@ const CustomInput = ({
     }
     return <>{props.children}</>;
   };
-
   const renderDecorator: RenderDecoratorFunction = (props) => {
     if (props.value === "strong") {
       return <strong>{props.children}</strong>;
@@ -102,7 +107,6 @@ const CustomInput = ({
     return <>{props.children}</>;
   };
   const [formError, setFormError] = useState(false);
-
   const checkIfEmpty = (
     value: Array<PortableTextBlock> | undefined
   ): boolean => {
@@ -114,7 +118,6 @@ const CustomInput = ({
           !Array.isArray(block.children) ||
           block.children.every((child: any) => !child.text?.trim())
       );
-
     return result;
   };
   const handlePost = async (
@@ -126,34 +129,34 @@ const CustomInput = ({
     if (session) {
       if (!isEmpty) {
         setFormError(false);
-        const comment = {
-          _id: "temp_id",
-          publishedAt: "posting...",
+        const comment: any = {
+          _id: "temp-id",
+          publishedAt: new Date().toISOString(),
           user: {
-            _id: "temp_id",
+            _id: session?.id,
             name: session?.user?.name as string | null,
             avatar: session?.user?.image as string | null,
           },
-          //temporary
           post: {
             _id: postId as string,
           },
           body: value as any,
           likes: [],
           dislikes: [],
-          sending: true,
+          replies: [],
         };
+        const _id = uuid();
         if (type === "reply") {
-          const reply = {
-            ...comment,
-            comment: {},
-            //input comment shit
-          };
-          addOptimisticReply && addOptimisticReply(reply);
-          // await postReply(value, commentId, postId)
+          delete comment.replies;
+          addOptimisticReply &&
+            addOptimisticReply({ ...comment, sending: true });
+          await postReply(value, postId, commentId, _id);
+          setReplies && setReplies((prev) => [{ ...comment, _id }, ...prev]);
         } else {
-          addOptimisticComment && addOptimisticComment(comment);
-          await postComment(value, postId);
+          addOptimisticComment &&
+            addOptimisticComment({ ...comment, sending: true });
+          await postComment(value, postId, _id);
+          setComments && setComments((prev) => [{ ...comment, _id }, ...prev]);
         }
       } else {
         setFormError(true);
@@ -242,7 +245,10 @@ function Toolbar({ type = "comment" }: { type: "comment" | "reply" }) {
     ),
 
     blockquote: (
-      <Quote strokeWidth="2.2" className={`${type === "reply" ? "size-[13px]" : "size-[15px]"} xs:size-[18px]`} />
+      <Quote
+        strokeWidth="2.2"
+        className={`${type === "reply" ? "size-[13px]" : "size-[15px]"} xs:size-[18px]`}
+      />
     ),
   };
   const decoratorIcons = {

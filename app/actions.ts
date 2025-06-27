@@ -5,7 +5,7 @@ import type { PortableTextBlock } from "@portabletext/editor";
 import { internalGroqTypeReferenceTo } from "@/sanity.types";
 import { REPLIES_QUERY } from "@/sanity/lib/queries";
 import { REPLIES_QUERYResult } from "@/sanity.types";
-import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/lib/client";
 
 export const signInAction = async () => {
   // "use server";
@@ -18,10 +18,12 @@ export const signOutAction = async () => {
 
 export const postComment = async (
   value: Array<PortableTextBlock> | undefined,
-  postId: string | undefined
+  postId: string | undefined,
+  commentId: string,
 ) => {
   if (value) {
     await writeClient.create({
+      _id: commentId,
       _type: "comment",
       publishedAt: new Date().toISOString(),
       user: {
@@ -35,6 +37,36 @@ export const postComment = async (
       body: value,
       likes: [],
       dislikes: [],
+    });
+  }
+};
+
+export const postReply = async (
+  value: Array<PortableTextBlock> | undefined,
+  postId: string | undefined,
+  commentId: string | undefined,
+  replyId: string,
+) => {
+  if (value) {
+    await writeClient.create({
+      _id: replyId,
+      _type: "reply",
+      publishedAt: new Date().toISOString(),
+      user: {
+        _type: "reference",
+        _ref: (await auth())?.id,
+      },
+      post: {
+        _type: "reference",
+        _ref: postId,
+      },
+      body: value,
+      likes: [],
+      dislikes: [],
+      comment: {
+        _type: "reference",
+        _ref: commentId,
+      },
     });
   }
 };
@@ -136,16 +168,4 @@ export const dislikeCommentAction = async (
 export const deleteCommentAction = async (id: string) => {
   await writeClient.delete(id);
 };
-
-export const getRepliesAction = async (
-  commentId: string
-): Promise<REPLIES_QUERYResult> => {
-  const replies = await sanityFetch({
-    query: REPLIES_QUERY,
-    params: { commentId },
-  });
-
-  return replies.data;
-};
-
 // writeClient.delete({query: '*[_type == "comment"]'})
