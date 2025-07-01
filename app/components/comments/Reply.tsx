@@ -14,7 +14,6 @@ import {
   deleteCommentAction,
 } from "@/app/actions";
 import { useTransition, useEffect } from "react";
-// import { REPLIES_QUERYResult } from "@/sanity.types";
 import type { REPLY } from "./Comment";
 import { timestamp } from "@/lib/utils";
 import { toast } from "sonner";

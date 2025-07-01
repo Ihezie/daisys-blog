@@ -22,23 +22,31 @@ import {
   deleteCommentAction,
 } from "@/app/actions";
 import {
-  useTransition,
   useOptimistic,
   Dispatch,
   SetStateAction,
-  useRef,
   useState,
   useEffect,
+  useTransition,
 } from "react";
 import { Session } from "next-auth";
 import CustomInput from "./CustomInput";
 import { toast } from "sonner";
-import { REPLIES_QUERYResult } from "@/sanity.types";
+import { COMMENTS_QUERYResult, REPLIES_QUERYResult } from "@/sanity.types";
 import { timestamp } from "@/lib/utils";
 import Reply from "./Reply";
+import { internalGroqTypeReferenceTo } from "@/sanity.types";
+import { uuid } from "@sanity/uuid";
 
 export type REPLY = REPLIES_QUERYResult[0] & {
   sending?: boolean;
+};
+export type REACTION = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  _key: string;
+  [internalGroqTypeReferenceTo]?: "user";
 };
 
 const Comment = ({
@@ -54,62 +62,113 @@ const Comment = ({
 }) => {
   const ownsComment = session?.id === comment.user?._id;
 
-  const [approvalIsPending, startApprovalTransition] = useTransition();
-  const [deleteIsPending, startDeleteTransition] = useTransition();
+  const [replies, setReplies] = useState<[] | REPLIES_QUERYResult>(
+    comment.replies
+  );
+  const [optimisticReplies, addOptimisticReplies] = useOptimistic(
+    replies,
+    (state, newReply: REPLY) => [newReply, ...state]
+  );
+  const [showReplies, setShowReplies] = useState(false);
+
+  const [isPending, startTransition] = useTransition();
+
+  const [likes, setLikes] = useState(comment.likes);
+  const [dislikes, setDislikes] = useState(comment.dislikes);
+  const [optimisticLikes, addOptimisticLike] = useOptimistic(
+    likes,
+    (state: Array<REACTION> | undefined | null, action: REACTION | string) => {
+      if (action instanceof Object) {
+        if (state) {
+          return [...state, action];
+        }
+      } else {
+        const newState = state?.filter((like) => like._ref === action);
+        return newState;
+      }
+    }
+  );
+  const [optimisticDislikes, addOptimisticDislike] = useOptimistic(
+    dislikes,
+    (state: Array<REACTION> | undefined | null, action: REACTION | string) => {
+      if (action instanceof Object) {
+        if (state) {
+          return [...state, action];
+        }
+      } else {
+        return state?.filter((dislike) => dislike._ref === action);
+      }
+    }
+  );
 
   const handleReaction = (type: "like" | "dislike") => {
     if (!session) {
       toast("Please sign in");
       return;
     }
-    startApprovalTransition(async () => {
-      if (type === "like") {
-        await likeCommentAction(comment._id, comment.likes, comment.dislikes);
-      } else {
-        await dislikeCommentAction(
+    const hasLiked = Boolean(
+      optimisticLikes?.some((user) => user._ref === session?.id)
+    );
+    const hasDisliked = Boolean(
+      optimisticDislikes?.some((user) => user._ref === session.id)
+    );
+    if (type === "like") {
+      startTransition(async () => {
+        if (hasDisliked) {
+          addOptimisticDislike(session.id);
+        }
+        if (hasLiked) {
+          addOptimisticLike(session.id); //Remove like
+        } else {
+          addOptimisticLike({
+            _key: uuid(),
+            _type: "reference",
+            _ref: session.id,
+          });
+        }
+        const updatedComment = await likeCommentAction(
           comment._id,
-          comment.likes,
-          comment.dislikes
+          hasLiked,
+          hasDisliked
         );
-      }
-      setCommentFetchIsPending(true);
-    });
+        setLikes(updatedComment.likes);
+        if (hasDisliked) {
+          setDislikes(updatedComment.dislikes);
+        }
+      });
+    } else {
+      startTransition(async () => {
+        if (hasLiked) {
+          addOptimisticLike(session.id);
+        }
+        if (hasDisliked) {
+          addOptimisticDislike(session.id);
+        } else {
+          addOptimisticDislike({
+            _key: uuid(),
+            _type: "reference",
+            _ref: session.id,
+          });
+        }
+        const updatedComment = await dislikeCommentAction(
+          comment._id,
+          hasDisliked,
+          hasLiked
+        );
+        setDislikes(updatedComment.dislikes);
+        if (hasLiked) {
+          setLikes(updatedComment.likes);
+        }
+      });
+    }
   };
-
-  useEffect(() => {
-    if (lengthOfLikes.current !== comment?.likes?.length) {
-      setCommentFetchIsPending(false);
-      lengthOfLikes.current = comment?.likes?.length;
-    }
-    if (lengthOfDislikes.current !== comment?.dislikes?.length) {
-      setCommentFetchIsPending(false);
-      lengthOfDislikes.current = comment?.dislikes?.length;
-    }
-  }, [comment]);
-
-  const [commentFetchIsPending, setCommentFetchIsPending] = useState(false);
-  const lengthOfLikes = useRef<number>(comment.likes?.length);
-  const lengthOfDislikes = useRef<number>(comment.dislikes?.length);
-
-  const [replies, setReplies] = useState<[] | REPLIES_QUERYResult>(
-    comment.replies
-  );
-
-  const [optimisticReplies, addOptimisticReplies] = useOptimistic(
-    replies,
-    (state, newReply: REPLY) => [newReply, ...state]
-  );
-
-  const [showReplies, setShowReplies] = useState(false);
 
   return (
     <>
       <div>
         <article
           className={
-            comment.sending || deleteIsPending
-              ? "[&_*]:opacity-50 pointer-events-none"
-              : ""
+            comment.sending ? "[&_*]:opacity-50 pointer-events-none" : ""
           }
         >
           <header className={"flex !opacity-100 items-center gap-3"}>
@@ -138,26 +197,24 @@ const Comment = ({
           <div className="ml-[50px] mt-1 flex justify-between items-center">
             <div className="flex gap-5 comment-btns">
               <button
-                className={`${approvalIsPending || commentFetchIsPending ? "opacity-25" : ""}`}
-                disabled={approvalIsPending || commentFetchIsPending}
+                disabled={isPending}
                 type="button"
                 onClick={() => {
                   handleReaction("like");
                 }}
               >
                 <ThumbsUp />
-                {comment.likes?.length}
+                {optimisticLikes?.length}
               </button>
               <button
-                className={`${approvalIsPending || commentFetchIsPending ? "opacity-30" : ""}`}
-                disabled={approvalIsPending || commentFetchIsPending}
+                disabled={isPending}
                 type="button"
                 onClick={() => {
                   handleReaction("dislike");
                 }}
               >
                 <ThumbsDown />
-                {comment.dislikes?.length}
+                {optimisticDislikes?.length}
               </button>
               <button
                 className={`${showReplyInput === comment?._id ? "active" : ""}`}
@@ -189,10 +246,8 @@ const Comment = ({
                     <Pencil /> <span className="mt-[1px]">Edit</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => {
-                      startDeleteTransition(async () => {
-                        await deleteCommentAction(comment._id);
-                      });
+                    onClick={async () => {
+                      await deleteCommentAction(comment._id);
                     }}
                   >
                     <Trash2 /> <span className="mt-[1px]">Delete</span>

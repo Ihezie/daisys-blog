@@ -3,23 +3,18 @@ import { signIn, auth, signOut } from "@/auth";
 import { writeClient } from "@/sanity/lib/write-client";
 import type { PortableTextBlock } from "@portabletext/editor";
 import { internalGroqTypeReferenceTo } from "@/sanity.types";
-import { REPLIES_QUERY } from "@/sanity/lib/queries";
-import { REPLIES_QUERYResult } from "@/sanity.types";
-import { client } from "@/sanity/lib/client";
 
 export const signInAction = async () => {
   // "use server";
   await signIn("google");
 };
-
 export const signOutAction = async () => {
   await signOut();
 };
-
 export const postComment = async (
   value: Array<PortableTextBlock> | undefined,
   postId: string | undefined,
-  commentId: string,
+  commentId: string
 ) => {
   if (value) {
     await writeClient.create({
@@ -40,12 +35,11 @@ export const postComment = async (
     });
   }
 };
-
 export const postReply = async (
   value: Array<PortableTextBlock> | undefined,
   postId: string | undefined,
   commentId: string | undefined,
-  replyId: string,
+  replyId: string
 ) => {
   if (value) {
     await writeClient.create({
@@ -70,28 +64,13 @@ export const postReply = async (
     });
   }
 };
-
 export const likeCommentAction = async (
   documentId: string,
-  likes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null,
-  dislikes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null
+  hasLiked: boolean,
+  hasDisliked: boolean
 ) => {
   const ref = (await auth())?.id;
-  const hasLiked = likes?.some((user) => user._ref === ref);
-  const hasDisliked = dislikes?.some((user) => user._ref === ref);
-
+  let patchedComment;
   if (hasDisliked) {
     await writeClient
       .patch(documentId)
@@ -99,7 +78,7 @@ export const likeCommentAction = async (
       .commit();
   }
   if (!hasLiked) {
-    await writeClient
+    patchedComment = await writeClient
       .patch(documentId)
       .setIfMissing({ likes: [] })
       .insert("after", "likes[-1]", [
@@ -112,32 +91,21 @@ export const likeCommentAction = async (
         autoGenerateArrayKeys: true,
       });
   } else {
-    await writeClient
+    patchedComment = await writeClient
       .patch(documentId)
       .unset([`likes[_ref=="${ref}"]`])
       .commit();
   }
+
+  return patchedComment;
 };
 export const dislikeCommentAction = async (
   documentId: string,
-  likes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null,
-  dislikes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null
+  hasDisliked: boolean,
+  hasLiked: boolean
 ) => {
   const ref = (await auth())?.id;
-  const hasLiked = likes?.some((user) => user._ref === ref);
-  const hasDisliked = dislikes?.some((user) => user._ref === ref);
+  let patchedComment;
   if (hasLiked) {
     await writeClient
       .patch(documentId)
@@ -145,7 +113,7 @@ export const dislikeCommentAction = async (
       .commit();
   }
   if (!hasDisliked) {
-    await writeClient
+    patchedComment = await writeClient
       .patch(documentId)
       .setIfMissing({ dislikes: [] })
       .insert("after", "dislikes[-1]", [
@@ -158,13 +126,13 @@ export const dislikeCommentAction = async (
         autoGenerateArrayKeys: true,
       });
   } else {
-    await writeClient
+    patchedComment = await writeClient
       .patch(documentId)
       .unset([`dislikes[_ref=="${ref}"]`])
       .commit();
   }
+  return patchedComment;
 };
-
 export const deleteCommentAction = async (id: string) => {
   await writeClient.delete(id);
 };
