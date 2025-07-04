@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { POSTS_QUERYResult } from "@/sanity.types";
 import { DateTime } from "ts-luxon";
+import { REACTION } from "@/app/components/comments/Comment";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,8 +25,8 @@ export const formatPreview = (
 
 export const formatTitle = (title: string | null, length?: number) => {
   if (title) {
-    if (title.length > 58) {
-      return title.slice(0, length || 57).trim() + "...";
+    if (title.length > 50) {
+      return title.slice(0, length || 49).trim() + "...";
     }
     return title;
   }
@@ -54,3 +55,10 @@ export const timestamp = (date: string | null) => {
     return `${timeSince} ${maxUnitStr} ago`;
   }
 };
+
+export function uniqueArr(arr: REACTION[] | null) {
+    const seen: Record<string, boolean> = {};
+    return arr?.filter((user) => {
+      return seen.hasOwnProperty(user._ref) ? false : (seen[user._ref] = true);
+    });
+  }

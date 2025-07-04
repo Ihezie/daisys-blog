@@ -11,7 +11,7 @@ import type {
   RenderStyleFunction,
 } from "@portabletext/editor";
 import { EventListenerPlugin } from "@portabletext/editor/plugins";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useEditor, useEditorSelector } from "@portabletext/editor";
 import {
   ALargeSmall,
@@ -25,11 +25,12 @@ import {
 } from "lucide-react";
 import * as selectors from "@portabletext/editor/selectors";
 import { postComment, postReply } from "@/app/actions";
-import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 import { Session } from "next-auth";
 import { uuid } from "@sanity/uuid";
-import { COMMENTS_QUERYResult, REPLIES_QUERYResult } from "@/sanity.types";
+import { COMMENTS_QUERYResult } from "@/sanity.types";
 import { Dispatch } from "react";
+import { OptimisticCommentActionType } from "./CommentSection";
+
 // ...
 const schemaDefinition = defineSchema({
   // Decorators are simple marks that don't hold any data
@@ -60,21 +61,19 @@ const schemaDefinition = defineSchema({
 const CustomInput = ({
   postId,
   commentId,
-  addOptimisticComment,
-  addOptimisticReply,
+  handleOptimisticComments,
   session,
   type = "comment",
-  setReplies,
   setComments,
+  setShowReplyInput,
 }: {
   postId: string | undefined;
   commentId?: string | undefined;
-  addOptimisticComment?: (action: COMMENT) => void;
-  addOptimisticReply?: (action: any) => void;
+  handleOptimisticComments: (action: OptimisticCommentActionType) => void;
   session: Session | null;
   type: "comment" | "reply";
-  setReplies?: Dispatch<SetStateAction<[] | REPLIES_QUERYResult>>;
-  setComments?: Dispatch<SetStateAction<[] | COMMENTS_QUERYResult>>;
+  setComments: Dispatch<SetStateAction<[] | COMMENTS_QUERYResult>>;
+  setShowReplyInput?: Dispatch<SetStateAction<string | false>>;
 }) => {
   const [value, setValue] = useState<Array<PortableTextBlock> | undefined>(
     undefined
@@ -143,27 +142,38 @@ const CustomInput = ({
           body: value as any,
           likes: [],
           dislikes: [],
-          replies: [],
         };
         const _id = uuid();
         if (type === "reply") {
-          delete comment.replies;
-          addOptimisticReply &&
-            addOptimisticReply({ ...comment, sending: true });
+          handleOptimisticComments({
+            type: "ADD REPLY",
+            payload: { ...comment, sending: true, comment: { _id: commentId } },
+          });
           await postReply(value, postId, commentId, _id);
-          setReplies && setReplies((prev) => [{ ...comment, _id }, ...prev]);
+          setComments((prev) => {
+            const newState = prev.map((item) => {
+              if (item._id === commentId) {
+                const newReplies = [{ ...comment, _id }, ...item.replies];
+                return { ...item, replies: newReplies };
+              }
+              return item;
+            });
+            return newState;
+          });
+          setShowReplyInput && setShowReplyInput(false);
         } else {
-          addOptimisticComment &&
-            addOptimisticComment({ ...comment, sending: true });
+          handleOptimisticComments({
+            type: "ADD COMMENT",
+            payload: { ...comment, sending: true, replies: [] },
+          });
           await postComment(value, postId, _id);
-          setComments && setComments((prev) => [{ ...comment, _id }, ...prev]);
+          setComments((prev) => [{ ...comment, _id, replies: [] }, ...prev]);
         }
       } else {
         setFormError(true);
       }
     }
   };
-
   return (
     <>
       <form
@@ -190,7 +200,7 @@ const CustomInput = ({
               }}
             />
             <PortableTextEditable
-              placeholder="Add a comment"
+              placeholder={type === "comment" ? "Add a comment" : "Add a reply"}
               renderStyle={renderStyle}
               renderDecorator={renderDecorator}
               renderBlock={(props) => <div>{props.children}</div>}

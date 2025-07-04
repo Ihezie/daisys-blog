@@ -1,20 +1,12 @@
 import {
   ChevronDown,
-  Ellipsis,
   MessageSquareText,
-  Pencil,
   ThumbsDown,
   ThumbsUp,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { PortableText } from "next-sanity";
+import { PortableText} from "next-sanity";
 import { COMMENT } from "@/app/(blog)/posts/[slug]/page";
 import {
   dislikeCommentAction,
@@ -22,31 +14,35 @@ import {
   deleteCommentAction,
 } from "@/app/actions";
 import {
-  useOptimistic,
   Dispatch,
   SetStateAction,
   useState,
-  useEffect,
   useTransition,
 } from "react";
 import { Session } from "next-auth";
 import CustomInput from "./CustomInput";
 import { toast } from "sonner";
-import { COMMENTS_QUERYResult, REPLIES_QUERYResult } from "@/sanity.types";
 import { timestamp } from "@/lib/utils";
 import Reply from "./Reply";
-import { internalGroqTypeReferenceTo } from "@/sanity.types";
-import { uuid } from "@sanity/uuid";
 
-export type REPLY = REPLIES_QUERYResult[0] & {
+import { uuid } from "@sanity/uuid";
+import { uniqueArr } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
+import { COMMENTS_QUERYResult } from "@/sanity.types";
+import { OptimisticCommentActionType } from "./CommentSection";
+
+export type REPLY = COMMENTS_QUERYResult[0]["replies"][0] & {
   sending?: boolean;
-};
-export type REACTION = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  _key: string;
-  [internalGroqTypeReferenceTo]?: "user";
 };
 
 const Comment = ({
@@ -54,52 +50,21 @@ const Comment = ({
   session,
   showReplyInput,
   setShowReplyInput,
+  handleOptimisticComments,
+  setComments,
 }: {
   comment: COMMENT;
   session: Session | null;
   showReplyInput: string | false;
   setShowReplyInput: Dispatch<SetStateAction<string | false>>;
+  handleOptimisticComments: (action: OptimisticCommentActionType) => void;
+  setComments: Dispatch<SetStateAction<[] | COMMENTS_QUERYResult>>;
 }) => {
   const ownsComment = session?.id === comment.user?._id;
 
-  const [replies, setReplies] = useState<[] | REPLIES_QUERYResult>(
-    comment.replies
-  );
-  const [optimisticReplies, addOptimisticReplies] = useOptimistic(
-    replies,
-    (state, newReply: REPLY) => [newReply, ...state]
-  );
   const [showReplies, setShowReplies] = useState(false);
 
-  const [isPending, startTransition] = useTransition();
-
-  const [likes, setLikes] = useState(comment.likes);
-  const [dislikes, setDislikes] = useState(comment.dislikes);
-  const [optimisticLikes, addOptimisticLike] = useOptimistic(
-    likes,
-    (state: Array<REACTION> | undefined | null, action: REACTION | string) => {
-      if (action instanceof Object) {
-        if (state) {
-          return [...state, action];
-        }
-      } else {
-        const newState = state?.filter((like) => like._ref === action);
-        return newState;
-      }
-    }
-  );
-  const [optimisticDislikes, addOptimisticDislike] = useOptimistic(
-    dislikes,
-    (state: Array<REACTION> | undefined | null, action: REACTION | string) => {
-      if (action instanceof Object) {
-        if (state) {
-          return [...state, action];
-        }
-      } else {
-        return state?.filter((dislike) => dislike._ref === action);
-      }
-    }
-  );
+  const [_, startTransition] = useTransition();
 
   const handleReaction = (type: "like" | "dislike") => {
     if (!session) {
@@ -107,23 +72,35 @@ const Comment = ({
       return;
     }
     const hasLiked = Boolean(
-      optimisticLikes?.some((user) => user._ref === session?.id)
+      comment.likes?.some((user) => user._ref === session?.id)
     );
     const hasDisliked = Boolean(
-      optimisticDislikes?.some((user) => user._ref === session.id)
+      comment.dislikes?.some((user) => user._ref === session.id)
     );
     if (type === "like") {
       startTransition(async () => {
-        if (hasDisliked) {
-          addOptimisticDislike(session.id);
-        }
         if (hasLiked) {
-          addOptimisticLike(session.id); //Remove like
+          handleOptimisticComments({
+            type: "REMOVE LIKE",
+            payload: {
+              commentId: comment._id,
+              userId: session.id,
+              reaction: null,
+            },
+          });
         } else {
-          addOptimisticLike({
-            _key: uuid(),
-            _type: "reference",
-            _ref: session.id,
+          handleOptimisticComments({
+            type: "ADD LIKE",
+            payload: {
+              commentId: comment._id,
+              userId: session.id,
+              reaction: {
+                _key: uuid(),
+                _type: "reference",
+                _ref: session.id,
+              },
+              hasDisliked,
+            },
           });
         }
         const updatedComment = await likeCommentAction(
@@ -131,23 +108,43 @@ const Comment = ({
           hasLiked,
           hasDisliked
         );
-        setLikes(updatedComment.likes);
-        if (hasDisliked) {
-          setDislikes(updatedComment.dislikes);
-        }
+        setComments((prev) => {
+          return prev.map((c) => {
+            if (c._id === comment._id) {
+              return {
+                ...comment,
+                likes: updatedComment?.likes || [],
+                dislikes: updatedComment?.dislikes || [],
+              };
+            }
+            return c;
+          });
+        });
       });
-    } else {
+    } else if (type === "dislike") {
       startTransition(async () => {
-        if (hasLiked) {
-          addOptimisticLike(session.id);
-        }
         if (hasDisliked) {
-          addOptimisticDislike(session.id);
+          handleOptimisticComments({
+            type: "REMOVE DISLIKE",
+            payload: {
+              commentId: comment._id,
+              userId: session.id,
+              reaction: null,
+            },
+          });
         } else {
-          addOptimisticDislike({
-            _key: uuid(),
-            _type: "reference",
-            _ref: session.id,
+          handleOptimisticComments({
+            type: "ADD DISLIKE",
+            payload: {
+              commentId: comment._id,
+              userId: session.id,
+              reaction: {
+                _key: uuid(),
+                _type: "reference",
+                _ref: session.id,
+              },
+              hasLiked,
+            },
           });
         }
         const updatedComment = await dislikeCommentAction(
@@ -155,14 +152,33 @@ const Comment = ({
           hasDisliked,
           hasLiked
         );
-        setDislikes(updatedComment.dislikes);
-        if (hasLiked) {
-          setLikes(updatedComment.likes);
-        }
+        setComments((prev) => {
+          return prev.map((c) => {
+            if (c._id === comment._id) {
+              return {
+                ...comment,
+                likes: updatedComment?.likes || [],
+                dislikes: updatedComment?.dislikes || [],
+              };
+            }
+            return c;
+          });
+        });
       });
     }
   };
-
+  const deleteComment = (id: string) => {
+    startTransition(async () => {
+      handleOptimisticComments({
+        type: "REMOVE COMMENT",
+        payload: id,
+      });
+      await deleteCommentAction(id);
+      setComments((prev) => {
+        return prev.filter((comment) => comment._id !== id);
+      });
+    });
+  };
   return (
     <>
       <div>
@@ -197,24 +213,34 @@ const Comment = ({
           <div className="ml-[50px] mt-1 flex justify-between items-center">
             <div className="flex gap-5 comment-btns">
               <button
-                disabled={isPending}
                 type="button"
                 onClick={() => {
                   handleReaction("like");
                 }}
               >
-                <ThumbsUp />
-                {optimisticLikes?.length}
+                <ThumbsUp
+                  className={
+                    comment.likes?.length !== 0
+                      ? "stroke-black/70 stroke-[1.6] fill-secondary-500"
+                      : ""
+                  }
+                />
+                {uniqueArr(comment.likes)?.length}
               </button>
               <button
-                disabled={isPending}
                 type="button"
                 onClick={() => {
                   handleReaction("dislike");
                 }}
               >
-                <ThumbsDown />
-                {optimisticDislikes?.length}
+                <ThumbsDown
+                  className={
+                    comment.dislikes?.length !== 0
+                      ? "stroke-black/70 stroke-[1.6] fill-secondary-500"
+                      : ""
+                  }
+                />
+                {uniqueArr(comment.dislikes)?.length}
               </button>
               <button
                 className={`${showReplyInput === comment?._id ? "active" : ""}`}
@@ -226,7 +252,7 @@ const Comment = ({
                   }
                   if (showReplyInput === comment?._id) {
                     setShowReplyInput(false);
-                    if (optimisticReplies.length === 0) setShowReplies(false);
+                    if (comment.replies.length === 0) setShowReplies(false);
                   } else {
                     setShowReplyInput(comment?._id);
                     setShowReplies(true);
@@ -237,23 +263,32 @@ const Comment = ({
               </button>
             </div>
             {ownsComment && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hover:text-secondary transition-colors outline-none focus:text-secondary">
-                  <Ellipsis />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-20 mr-5 sm:mr-16">
-                  <DropdownMenuItem>
-                    <Pencil /> <span className="mt-[1px]">Edit</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await deleteCommentAction(comment._id);
-                    }}
-                  >
-                    <Trash2 /> <span className="mt-[1px]">Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <AlertDialog>
+                <AlertDialogTrigger className="hover:text-secondary">
+                  <Trash2 size={20} />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="font-bold">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="hover:bg-red-600 font-bold"
+                      onClick={() => {
+                        deleteComment(comment._id);
+                      }}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </article>
@@ -274,12 +309,13 @@ const Comment = ({
               commentId={comment._id}
               session={session}
               type="reply"
-              addOptimisticReply={addOptimisticReplies}
-              setReplies={setReplies}
+              handleOptimisticComments={handleOptimisticComments}
+              setComments={setComments}
+              setShowReplyInput={setShowReplyInput}
             />
           </div>
         )}
-        {optimisticReplies.length > 0 && (
+        {comment.replies?.length > 0 && (
           <button
             type="button"
             className="text-[13px] ml-12 mt-1 flex gap-1 items-center transition-colors text-secondary-400 font-bold hover:underline"
@@ -287,8 +323,8 @@ const Comment = ({
               setShowReplies(!showReplies);
             }}
           >
-            {optimisticReplies.length}{" "}
-            {optimisticReplies.length > 1 ? "Replies" : "Reply"}
+            {comment.replies?.length}{" "}
+            {comment.replies?.length > 1 ? "Replies" : "Reply"}
             <ChevronDown
               className={showReplies ? "rotate-180" : ""}
               size={18}
@@ -297,25 +333,19 @@ const Comment = ({
         )}
       </div>
       {showReplies && (
-        <Replies optimisticReplies={optimisticReplies} session={session} />
+        <section className="pl-[50px] mt-2">
+          {comment.replies?.map((reply) => (
+            <Reply
+              key={reply._id}
+              reply={reply}
+              session={session}
+              handleOptimisticComments={handleOptimisticComments}
+              setComments={setComments}
+            />
+          ))}
+        </section>
       )}
     </>
   );
 };
 export default Comment;
-
-const Replies = ({
-  optimisticReplies,
-  session,
-}: {
-  optimisticReplies: Array<REPLY>;
-  session: Session | null;
-}) => {
-  return (
-    <section className="pl-[50px] mt-2">
-      {optimisticReplies.map((reply) => (
-        <Reply key={reply._id} reply={reply} session={session} />
-      ))}
-    </section>
-  );
-};

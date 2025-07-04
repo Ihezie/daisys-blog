@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@portabletext/editor": "^1.47.0",
+    "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.7",
     "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-slot": "^1.2.3",
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^3.74.1",
     "class-variance-authority": "^0.7.1",

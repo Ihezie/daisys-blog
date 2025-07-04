@@ -517,7 +517,7 @@ export type USER_BY_ID_QUERYResult = {
   avatar: string | null;
 } | null;
 // Variable: COMMENTS_QUERY
-// Query: *[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,  "replies": *[_type == "reply" && references(^._id)]|order(_publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}}
+// Query: *[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,  "replies": *[_type == "reply" && references(^._id)]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, comment -> {_id}, body, likes, dislikes}}
 export type COMMENTS_QUERYResult = Array<{
   _id: string;
   publishedAt: string | null;
@@ -572,6 +572,9 @@ export type COMMENTS_QUERYResult = Array<{
     post: {
       _id: string;
     } | null;
+    comment: {
+      _id: string;
+    } | null;
     body: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -606,52 +609,6 @@ export type COMMENTS_QUERYResult = Array<{
     }> | null;
   }>;
 }>;
-// Variable: REPLIES_QUERY
-// Query: *[_type == "reply" && comment._ref == $commentId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}
-export type REPLIES_QUERYResult = Array<{
-  _id: string;
-  publishedAt: string | null;
-  user: {
-    _id: string;
-    name: string | null;
-    avatar: string | null;
-  } | null;
-  post: {
-    _id: string;
-  } | null;
-  body: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }> | null;
-  likes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null;
-  dislikes: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
-  }> | null;
-}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -663,7 +620,6 @@ declare module "@sanity/client" {
     "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]": CAROUSEL_POSTS_QUERYResult;
     "*[_type == \"post\" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]": SINGLE_POST_QUERYResult;
     "*[_type == \"user\" && id == $id][0]{_id, name, avatar}": USER_BY_ID_QUERYResult;
-    "*[_type == \"comment\" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,\n  \"replies\": *[_type == \"reply\" && references(^._id)]|order(_publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}}": COMMENTS_QUERYResult;
-    "*[_type == \"reply\" && comment._ref == $commentId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes}": REPLIES_QUERYResult;
+    "*[_type == \"comment\" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,\n  \"replies\": *[_type == \"reply\" && references(^._id)]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, comment -> {_id}, body, likes, dislikes}}": COMMENTS_QUERYResult;
   }
 }

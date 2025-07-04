@@ -1,11 +1,5 @@
-import { Ellipsis, Pencil, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
 import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { PortableText } from "next-sanity";
 import { Session } from "next-auth";
 import {
@@ -13,57 +7,210 @@ import {
   likeCommentAction,
   deleteCommentAction,
 } from "@/app/actions";
-import { useTransition, useEffect } from "react";
+import { useState, useOptimistic, useTransition } from "react";
 import type { REPLY } from "./Comment";
 import { timestamp } from "@/lib/utils";
 import { toast } from "sonner";
-import { useState, useRef } from "react";
+import { Dispatch, SetStateAction } from "react";
+import { COMMENTS_QUERYResult } from "@/sanity.types";
+import { uuid } from "@sanity/uuid";
+import { uniqueArr } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
+import type { OptimisticCommentActionType, REACTION } from "./CommentSection";
+
+export function optimisticReactionsReducer(
+  state: { likes: REACTION[] | null; dislikes: REACTION[] | null },
+  action: {
+    type: "ADD LIKE" | "REMOVE LIKE" | "ADD DISLIKE" | "REMOVE DISLIKE";
+    payload: {
+      id: string;
+      reaction: REACTION | null;
+      hasDisliked?: boolean;
+      hasLiked?: boolean;
+    };
+  }
+) {
+  if (!state.likes || !state.dislikes) return state;
+  switch (action.type) {
+    case "ADD LIKE":
+      if (action.payload.hasDisliked) {
+        return {
+          likes: [...state.likes, action.payload.reaction as REACTION],
+          dislikes: state.dislikes.filter(
+            (dislike) => dislike._ref !== action.payload.id
+          ),
+        };
+      } else {
+        return {
+          ...state,
+          likes: [...state.likes, action.payload.reaction as REACTION],
+        };
+      }
+    case "REMOVE LIKE":
+      return {
+        ...state,
+        likes: state.likes.filter((like) => like._ref !== action.payload.id),
+      };
+    case "ADD DISLIKE":
+      if (action.payload.hasLiked) {
+        return {
+          dislikes: [...state.dislikes, action.payload.reaction as REACTION],
+          likes: state.likes.filter((like) => like._ref !== action.payload.id),
+        };
+      } else {
+        return {
+          ...state,
+          dislikes: [...state.dislikes, action.payload.reaction as REACTION],
+        };
+      }
+    case "REMOVE DISLIKE":
+      return {
+        ...state,
+        dislikes: state.dislikes.filter(
+          (dislike) => dislike._ref !== action.payload.id
+        ),
+      };
+    default:
+      return state;
+  }
+}
 
 const Reply = ({
   reply,
   session,
+  handleOptimisticComments,
+  setComments,
 }: {
   reply: REPLY;
   session: Session | null;
+  handleOptimisticComments: (action: OptimisticCommentActionType) => void;
+  setComments: Dispatch<SetStateAction<[] | COMMENTS_QUERYResult>>;
 }) => {
   const ownsReply = session?.id === reply.user?._id;
 
-  const [approvalIsPending, startApprovalTransition] = useTransition();
-  const [deleteIsPending, startDeleteTransition] = useTransition();
+  const [reactions, setReactions] = useState({
+    likes: reply.likes,
+    dislikes: reply.dislikes,
+  });
+  const [optimisticReactions, handleOptimisticReactions] = useOptimistic(
+    reactions,
+    optimisticReactionsReducer
+  );
+  const [_, startTransition] = useTransition();
 
   const handleReaction = (type: "like" | "dislike") => {
     if (!session) {
       toast("Please sign in");
       return;
     }
-    startApprovalTransition(async () => {
-      if (type === "like") {
-        await likeCommentAction(reply._id, reply.likes, reply.dislikes);
-      } else {
-        await dislikeCommentAction(reply._id, reply.likes, reply.dislikes);
-      }
-      setCommentFetchIsPending(true);
+    const hasLiked = Boolean(
+      optimisticReactions.likes?.some((user) => user._ref === session?.id)
+    );
+    const hasDisliked = Boolean(
+      optimisticReactions.dislikes?.some((user) => user._ref === session.id)
+    );
+    if (type === "like") {
+      startTransition(async () => {
+        if (hasLiked) {
+          handleOptimisticReactions({
+            type: "REMOVE LIKE",
+            payload: {
+              id: session.id,
+              reaction: null,
+            },
+          });
+        } else {
+          handleOptimisticReactions({
+            type: "ADD LIKE",
+            payload: {
+              id: session.id,
+              reaction: {
+                _key: uuid(),
+                _type: "reference",
+                _ref: session.id,
+              },
+              hasDisliked,
+            },
+          });
+        }
+        const updatedComment = await likeCommentAction(
+          reply._id,
+          hasLiked,
+          hasDisliked
+        );
+        setReactions({
+          likes: updatedComment.likes,
+          dislikes: updatedComment.dislikes,
+        });
+      });
+    } else {
+      startTransition(async () => {
+        if (hasDisliked) {
+          handleOptimisticReactions({
+            type: "REMOVE DISLIKE",
+            payload: {
+              id: session.id,
+              reaction: null,
+            },
+          });
+        } else {
+          handleOptimisticReactions({
+            type: "ADD DISLIKE",
+            payload: {
+              id: session.id,
+              reaction: {
+                _key: uuid(),
+                _type: "reference",
+                _ref: session.id,
+              },
+              hasLiked,
+            },
+          });
+        }
+        const updatedComment = await dislikeCommentAction(
+          reply._id,
+          hasDisliked,
+          hasLiked
+        );
+        setReactions({
+          likes: updatedComment.likes,
+          dislikes: updatedComment.dislikes,
+        });
+      });
+    }
+  };
+  const deleteReply = (id: string) => {
+    startTransition(async () => {
+      handleOptimisticComments({
+        type: "REMOVE REPLY",
+        payload: id,
+      });
+      await deleteCommentAction(id);
+      setComments((prev) => {
+        const newState = prev.map((comment) => {
+          const newReplies = comment.replies.filter(
+            (reply) => id !== reply._id
+          );
+          return { ...comment, replies: newReplies };
+        });
+        return newState;
+      });
     });
   };
 
-  useEffect(() => {
-    if (lengthOfLikes.current !== reply.likes?.length) {
-      setCommentFetchIsPending(false);
-      lengthOfLikes.current = reply?.likes?.length;
-    }
-    if (lengthOfDislikes.current !== reply.dislikes?.length) {
-      setCommentFetchIsPending(false);
-      lengthOfDislikes.current = reply.dislikes?.length;
-    }
-  }, [reply]);
-
-  const [commentFetchIsPending, setCommentFetchIsPending] = useState(false);
-  const lengthOfLikes = useRef<number>(reply.likes?.length);
-  const lengthOfDislikes = useRef<number>(reply.dislikes?.length);
-
   return (
     <article
-      className={reply.sending || deleteIsPending ? "[&_*]:opacity-50 pointer-events-none" : ""}
+      className={reply.sending ? "[&_*]:opacity-50 pointer-events-none" : ""}
     >
       <header className={"flex !opacity-100 items-center gap-3"}>
         <div
@@ -89,48 +236,63 @@ const Reply = ({
       <div className="ml-[50px] mt-1 flex justify-between items-center">
         <div className="flex gap-5 comment-btns">
           <button
-            className={`${approvalIsPending || commentFetchIsPending ? "opacity-25" : ""}`}
-            disabled={approvalIsPending || commentFetchIsPending}
             type="button"
             onClick={() => {
               handleReaction("like");
             }}
           >
-            <ThumbsUp />
-            {reply.likes?.length}
+            <ThumbsUp
+              className={
+                optimisticReactions?.likes?.length !== 0
+                  ? "stroke-black/70 stroke-[1.6] fill-secondary-500"
+                  : ""
+              }
+            />
+            {uniqueArr(optimisticReactions.likes)?.length}
           </button>
           <button
-            className={`${approvalIsPending || commentFetchIsPending ? "opacity-30" : ""}`}
-            disabled={approvalIsPending || commentFetchIsPending}
             type="button"
             onClick={() => {
               handleReaction("dislike");
             }}
           >
-            <ThumbsDown />
-            {reply.dislikes?.length}
+            <ThumbsDown
+              className={
+                optimisticReactions?.dislikes?.length !== 0
+                  ? "stroke-black/70 stroke-[1.6] fill-secondary-500"
+                  : ""
+              }
+            />
+            {uniqueArr(optimisticReactions.dislikes)?.length}
           </button>
         </div>
         {ownsReply && (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="hover:text-secondary transition-colors outline-none focus:text-secondary">
-              <Ellipsis />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-20 mr-5 sm:mr-16">
-              <DropdownMenuItem>
-                <Pencil /> <span className="mt-[1px]">Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  startDeleteTransition(async () => {
-                    await deleteCommentAction(reply._id);
-                  });
-                }}
-              >
-                <Trash2 /> <span className="mt-[1px]">Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AlertDialog>
+            <AlertDialogTrigger className="hover:text-secondary">
+              <Trash2 size={20} />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Reply</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="font-bold">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="hover:bg-red-600 font-bold"
+                  onClick={() => {
+                    deleteReply(reply._id);
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
     </article>
