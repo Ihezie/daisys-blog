@@ -18,7 +18,7 @@ const CategoryCard = ({
     <div className="h-72 custom-transition rounded-3xl bg-white p-2 hover:scale-[1.08] hover:shadow-[0_8px_20px_rgb(0,0,0,0.12)] w-[160px] xs:w-[180px] lg:flex-none">
       <Link href={`/posts?filter=${category?.name}`}>
         <Image
-          className="object-cover rounded-[20px] relative h-[85%]"
+          className="object-cover rounded-[20px] relative w-full h-[85%]"
           src={categoryImageUrl || "/no-image.jpg"}
           alt={category.name || "no-image"}
           width={164}

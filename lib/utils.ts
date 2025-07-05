@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { POSTS_QUERYResult } from "@/sanity.types";
 import { DateTime } from "ts-luxon";
-import { REACTION } from "@/app/components/comments/Comment";
+import { REACTION } from "@/app/components/comments/CommentSection";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -48,17 +48,17 @@ export const timestamp = (date: string | null) => {
       "years",
     ]);
     const maxUnit = diff.getMaxUnit(false);
-    const maxUnitStr =
-      diff[maxUnit] === 1 ? maxUnit.replace(/s$/, "") : (maxUnit as string);
     let timeSince = diff[maxUnit] as number;
-    timeSince = Math.round(timeSince);
+    timeSince = Math.round(timeSince) || 1;
+    const maxUnitStr =
+      timeSince === 1 ? maxUnit.replace(/s$/, "") : (maxUnit as string);
     return `${timeSince} ${maxUnitStr} ago`;
   }
 };
 
 export function uniqueArr(arr: REACTION[] | null) {
-    const seen: Record<string, boolean> = {};
-    return arr?.filter((user) => {
-      return seen.hasOwnProperty(user._ref) ? false : (seen[user._ref] = true);
-    });
-  }
+  const seen: Record<string, boolean> = {};
+  return arr?.filter((user) => {
+    return seen.hasOwnProperty(user._ref) ? false : (seen[user._ref] = true);
+  });
+}

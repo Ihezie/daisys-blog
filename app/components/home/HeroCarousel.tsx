@@ -4,7 +4,7 @@ import Image from "next/image";
 import CarouselBtn from "./CarouselBtn";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import CarouselIndicators from "./CarouselIndicators";
 import { AboutBlog } from "@/app/data";
 import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
@@ -52,7 +52,7 @@ const HeroCarousel = ({
   useEffect(() => {
     if (!session?.user && currentIndex != 0) {
       setCurrentIndex(0);
-    };
+    }
   }, [session]);
 
   return (

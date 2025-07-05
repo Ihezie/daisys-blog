@@ -25,7 +25,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="">
+    <main>
       <HeroCarousel session={session} carouselData={carouselData} />
       <CategoryCarousel categories={categories} />
     </main>
