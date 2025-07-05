@@ -13,9 +13,9 @@ import { COMMENTS_QUERYResult } from "@/sanity.types";
 import { sanityFetch } from "@/sanity/lib/live";
 import { auth } from "@/auth";
 
-const myPortableTextComponents = {   
+const myPortableTextComponents = {
   block: {
-    h1: ({ children, node }: any) => <h1 id={node._key}>{children}</h1>,  
+    h1: ({ children, node }: any) => <h1 id={node._key}>{children}</h1>,
     h2: ({ children, node }: any) => <h2 id={node._key}>{children}</h2>,
     h3: ({ children, node }: any) => <h3 id={node._key}>{children}</h3>,
   },
@@ -27,11 +27,9 @@ export type COMMENT = COMMENTS_QUERYResult[0] & {
 
 const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const slug = (await params).slug;
-  const post = await client.fetch<SINGLE_POST_QUERYResult>(
-    SINGLE_POST_QUERY,
-    { slug: slug }
-    // { cache: "force-cache" }
-  );
+  const post = await client.fetch<SINGLE_POST_QUERYResult>(SINGLE_POST_QUERY, {
+    slug: slug,
+  });
   const postImageUrl = post?.image
     ? urlFor(post.image)?.width(1500).height(1200).url()
     : null;
@@ -43,7 +41,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
     query: COMMENTS_QUERY,
     params: { postId: post?._id },
   });
-  
+
   const session = await auth();
   return (
     <main className="pt-6">

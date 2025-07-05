@@ -1,7 +1,4 @@
 import Image from "next/image";
-import imageUrlBuilder from "@sanity/image-url";
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
-import { client } from "@/sanity/lib/client";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
