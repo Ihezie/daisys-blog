@@ -44,7 +44,7 @@ const PostCard = ({ post }: { post: SinglePostQuery }) => {
           {Array.isArray(post.body) && formatPreview(post?.body)}
           <span className="text-3xl/[0px]">&#8230;</span>
           <Link href={`/posts/${post?.slug?.current}`} className="block mt-1">
-            <span className="text-black hover:text-secondary">
+            <span className="text-black hover:text-secondary font-semibold">
               read more{" "}
               <MoveRight className="inline-block hover:text-secondary" />{" "}
             </span>

@@ -2,14 +2,16 @@
 
 import CategoryCard from "./CategoryCard";
 import CarouselBtn from "./CarouselBtn";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, use } from "react";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
 const CategoryCarousel = ({
-  categories,
+  rawCategories,
 }: {
-  categories: CATEGORIES_QUERYResult;
+  rawCategories: Promise<CATEGORIES_QUERYResult>;
 }) => {
+  const categories = use(rawCategories);
+
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const cardsContainerParentRef = useRef<HTMLDivElement>(null);
   const forwards = () => {
@@ -48,7 +50,7 @@ const CategoryCarousel = ({
     <section className="my-16">
       <h2 className="text-center">Categories</h2>
       <section className="relative">
-        <div className="absolute abs-center-y -left-16 hidden md:flex">
+        <div className="absolute abs-center-y -left-16 hidden md:flex xxl:hidden">
           <CarouselBtn icon="left" handleClick={backwards} />
         </div>
         <div
@@ -57,14 +59,14 @@ const CategoryCarousel = ({
         >
           <div
             ref={cardsContainerRef}
-            className={`grid grid-cols-2 custom-transition gap-x-4 gap-y-10 justify-items-center md:flex md:gap-5 md:w-max`}
+            className="grid grid-cols-2 sm:grid-cols-3 custom-transition gap-x-4 gap-y-10 justify-items-center md:flex md:gap-5 md:w-max"
           >
             {categories?.map((category) => (
               <CategoryCard key={category._id} category={category} />
             ))}
           </div>
         </div>
-        <div className="absolute abs-center-y -right-16 hidden md:flex">
+        <div className="absolute abs-center-y -right-16 hidden md:flex xxl:hidden">
           <CarouselBtn icon="right" handleClick={forwards} />
         </div>
       </section>

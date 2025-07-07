@@ -4,21 +4,27 @@ import Image from "next/image";
 import CarouselBtn from "./CarouselBtn";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import CarouselIndicators from "./CarouselIndicators";
-import { AboutBlog } from "@/app/data";
+import { AboutBlog, aboutBlog } from "@/app/data";
 import { CAROUSEL_POSTS_QUERYResult } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
 import { formatDate, formatPreview, formatTitle } from "@/lib/utils";
 import { Session } from "next-auth";
+import { useRouter } from "next/navigation";
 
 const HeroCarousel = ({
-  carouselData = [],
+  rawCarouselData,
   session,
 }: {
-  carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[];
+  rawCarouselData: Promise<CAROUSEL_POSTS_QUERYResult>;
   session: Session | null;
 }) => {
+  let carouselData: (AboutBlog | CAROUSEL_POSTS_QUERYResult[0])[] =
+    use(rawCarouselData);
+  if (!session?.user) {
+    carouselData = [aboutBlog, ...carouselData];
+  }
   const [currentIndex, setCurrentIndex] = useState(0);
   const [play, setPlay] = useState(true);
   const nextSlide = () => {
@@ -46,17 +52,20 @@ const HeroCarousel = ({
     }
   }, [currentIndex, play]);
 
-  if (carouselData.length === 0) {
-    return <div>No Carousel Data</div>;
-  }
   useEffect(() => {
     if (!session?.user && currentIndex != 0) {
       setCurrentIndex(0);
     }
   }, [session]);
 
+  const router = useRouter();
+
+  if (carouselData.length === 0) {
+    return <div>No Carousel Data</div>;
+  }
+
   return (
-    <section className="mt-10 bg-white p-3 pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%]">
+    <section className="mt-10 bg-white p-3 pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%] carousel-hover-effect">
       <div className="relative rounded-3xl">
         <div className="flex rounded-3xl relative overflow-hidden">
           {carouselData.map((item, index) => {
@@ -76,12 +85,19 @@ const HeroCarousel = ({
             }
             return (
               <Image
+                onClick={() => {
+                  item._type === "post"
+                    ? router.push(
+                        `/posts/${(item as CAROUSEL_POSTS_QUERYResult[0]).slug?.current}`
+                      )
+                    : null;
+                }}
                 key={item.title}
                 src={src}
                 width={1260}
                 height={1240}
                 alt={item.title || "no title"}
-                className={`rounded-3xl custom-transition ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] min-height object-cover lg:max-h-[500px]`}
+                className={`rounded-3xl ${item._type === "post" ? "cursor-pointer hover:scale-125" : ""} custom-transition ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] object-cover lg:h-[470px] lg:max-h-none`}
               />
             );
           })}
@@ -167,7 +183,7 @@ const TextSection = ({
           <button type="button" className="block mt-3">
             <Link
               href={`/posts/${currentItemData?.slug?.current}`}
-              className="hover:text-secondary group custom-transition"
+              className="hover:text-secondary group custom-transition font-bold"
             >
               read more{" "}
               <MoveRight className="inline-block group-hover:text-secondary custom-transition" />{" "}

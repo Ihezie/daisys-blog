@@ -53,7 +53,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
           {post?.category?.name}
         </span>
         <span className="border-r h-7 inline-block border-black/50"></span>
-        <span className="">{formatDate(post?.publishedAt || "")}</span>
+        <span>{formatDate(post?.publishedAt || "")}</span>
       </div>
       <h1 className="text-center mt-8">{post?.title}</h1>
       <Image

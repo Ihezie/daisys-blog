@@ -118,6 +118,9 @@
   .hover-effect:hover + div p a span {
     @apply text-secondary;
   }
+  .carousel-hover-effect:has(img:hover) article button a {
+    @apply text-secondary;
+  }
   .active-decorator svg {
     @apply text-secondary;
   }

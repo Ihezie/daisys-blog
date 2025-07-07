@@ -27,10 +27,7 @@ const Posts = async (props: {
   const posts = await client.fetch<POSTS_QUERYResult>(
     POSTS_QUERY,
     params,
-    // options,
-    {
-      cache: "force-cache",
-    }
+    options
   );
 
   const categories = await client.fetch(
