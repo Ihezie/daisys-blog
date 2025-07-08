@@ -86,6 +86,9 @@ const MobileNav = ({
         </ul>
       </motion.nav>
       <motion.div
+        onClick={() => {
+          setIsVisible(false);
+        }}
         variants={overlay}
         initial="hide"
         animate="show"

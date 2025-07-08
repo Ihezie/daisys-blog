@@ -22,3 +22,6 @@ export const COMMENTS_QUERY = defineQuery(
   `*[_type == "comment" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,
   "replies": *[_type == "reply" && references(^._id)]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, comment -> {_id}, body, likes, dislikes}}`
 );
+export const TOP_POSTS_QUERY = defineQuery(
+  `*[_type == "post" && defined(slug.current)]|order(count(*[_type == "comment" && references(^._id)]) desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...3]`
+);

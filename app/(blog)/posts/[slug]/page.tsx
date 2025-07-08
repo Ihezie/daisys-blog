@@ -12,6 +12,7 @@ import { COMMENTS_QUERY } from "@/sanity/lib/queries";
 import { COMMENTS_QUERYResult } from "@/sanity.types";
 import { sanityFetch } from "@/sanity/lib/live";
 import { auth } from "@/auth";
+import Link from "next/link";
 
 const myPortableTextComponents = {
   block: {
@@ -117,7 +118,8 @@ const TableOfContents = ({
             ].join(" ");
             return (
               <li key={item._key}>
-                <a
+                <Link
+                  replace={true}
                   href={`#${item?._key}`}
                   className="border-b group border-black py-[10px] flex justify-between cursor-pointer"
                 >
@@ -126,7 +128,7 @@ const TableOfContents = ({
                   </span>
                   <ArrowDown className="group-hover:text-secondary custom-transition xl:hidden" />
                   <ArrowRight className="group-hover:text-secondary custom-transition hidden xl:block" />
-                </a>
+                </Link>
               </li>
             );
           }

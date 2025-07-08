@@ -6,7 +6,7 @@ const CarouselIndicators = ({
   currentIndex: number;
 }) => {
   return (
-    <div className="absolute bottom-4 abs-center-x flex gap-2">
+    <div className="absolute bottom-4 abs-center-x flex gap-2 z-20">
       {[...Array(amount)].map((_, i) => (
         <span
           key={i}

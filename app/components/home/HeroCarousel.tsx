@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import CarouselBtn from "./CarouselBtn";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
 import React, { useState, useEffect, use } from "react";
@@ -12,6 +11,15 @@ import { urlFor } from "@/sanity/lib/image";
 import { formatDate, formatPreview, formatTitle } from "@/lib/utils";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/app/components/ui/carousel";
+import { type CarouselApi } from "@/app/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const HeroCarousel = ({
   rawCarouselData,
@@ -25,56 +33,58 @@ const HeroCarousel = ({
   if (!session?.user) {
     carouselData = [aboutBlog, ...carouselData];
   }
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [play, setPlay] = useState(true);
-  const nextSlide = () => {
-    if (currentIndex === carouselData.length - 1) {
-      setCurrentIndex(0);
-    } else {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-  const prevSlide = () => {
-    if (currentIndex === 0) {
-      setCurrentIndex(carouselData.length - 1);
-    } else {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-  useEffect(() => {
-    if (play) {
-      const id = setInterval(() => {
-        nextSlide();
-      }, 5000);
-      return () => {
-        clearInterval(id);
-      };
-    }
-  }, [currentIndex, play]);
+  const router = useRouter();
+
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    if (!session?.user && currentIndex != 0) {
-      setCurrentIndex(0);
+    if (!session?.user && current != 0) {
+      setCurrent(0);
+      if (api) {
+        api.scrollTo(0);
+      }
     }
   }, [session]);
 
-  const router = useRouter();
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   if (carouselData.length === 0) {
     return <div>No Carousel Data</div>;
   }
 
   return (
-    <section className="mt-10 bg-white p-3 pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%] carousel-hover-effect">
-      <div className="relative rounded-3xl">
-        <div className="flex rounded-3xl relative overflow-hidden">
-          {carouselData.map((item, index) => {
-            let position = "";
-            if (currentIndex > index) {
-              position = "prev-slide";
-            } else if (currentIndex < index) {
-              position = "next-slide";
-            }
+    <section className="mt-10 bg-white sm:pb-5 rounded-[32px] sm:p-5 lg:grid grid-cols-[60%_40%] carousel-hover-effect">
+      <Carousel
+        opts={{
+          loop: true,
+        }}
+        plugins={[
+          Autoplay({
+            delay: 5000,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+          }),
+        ]}
+        setApi={setApi}
+        className="relative rounded-3xl"
+      >
+        <CarouselIndicators
+          amount={carouselData?.length}
+          currentIndex={current}
+        />
+        <CarouselContent>
+          {carouselData.map((item) => {
             let src = "";
             if (item._type === "post") {
               src = item.image
@@ -84,7 +94,8 @@ const HeroCarousel = ({
               src = (item as AboutBlog).image;
             }
             return (
-              <Image
+              <CarouselItem
+                key={item.title}
                 onClick={() => {
                   item._type === "post"
                     ? router.push(
@@ -92,33 +103,22 @@ const HeroCarousel = ({
                       )
                     : null;
                 }}
-                key={item.title}
-                src={src}
-                width={1260}
-                height={1240}
-                alt={item.title || "no title"}
-                className={`rounded-3xl ${item._type === "post" ? "cursor-pointer hover:scale-125" : ""} custom-transition ${position} flex-none h-[45vh] sm:h-[60vh] xs:h-[48vh] max-h-[420px] object-cover lg:h-[470px] lg:max-h-none`}
-              />
+              >
+                <Image
+                  src={src}
+                  width={1260}
+                  height={1240}
+                  alt={item.title || "no title"}
+                  className={` ${item._type === "post" ? "cursor-pointer sm:hover:scale-125" : ""} custom-transition flex-none h-[60vh] max-h-[330px] xs:max-h-[420px] object-cover lg:h-[470px] lg:max-h-none`}
+                />
+              </CarouselItem>
             );
           })}
-          <CarouselIndicators
-            amount={carouselData.length}
-            currentIndex={currentIndex}
-          />
-        </div>
-        <div className="flex mt-3 gap-5 justify-center lg:absolute lg:bottom-0 lg:-right-8 lg:translate-x-full lg:gap-4">
-          <CarouselBtn handleClick={prevSlide} icon="left" />
-          <div
-            onClick={() => {
-              setPlay(!play);
-            }}
-          >
-            {play ? <CarouselBtn icon="pause" /> : <CarouselBtn icon="play" />}
-          </div>
-          <CarouselBtn handleClick={nextSlide} icon="right" />
-        </div>
-      </div>
-      <TextSection currentItem={carouselData[currentIndex]} />
+        </CarouselContent>
+        <CarouselPrevious className="hidden sm:flex" />
+        <CarouselNext className="hidden sm:flex" />
+      </Carousel>
+      <TextSection currentItem={carouselData[current]} />
     </section>
   );
 };
@@ -132,7 +132,7 @@ const TextSection = ({
   if (currentItem._type === "about-blog") {
     const currentItemData = currentItem as unknown as AboutBlog;
     return (
-      <article className="mt-5 lg:mt-16 lg:px-8 max-xl:lg:mb-10 text-center lg:text-left">
+      <article className="mt-5 p-3 sm:p-0 lg:mt-16 lg:px-8 max-xl:lg:mb-10 text-center lg:text-left">
         <header className="flex gap-3 items-center justify-center lg:justify-start">
           <h1>{currentItemData.title}</h1>
           <Image
@@ -166,7 +166,7 @@ const TextSection = ({
       currentItemData.category?.tailwindColor || "bg-purple-400";
 
     return (
-      <article className="mt-5 lg:mt-10 lg:px-8">
+      <article className="mt-5 p-3 sm:p-0 lg:mt-10 lg:px-8">
         <h1>{formatTitle(currentItemData.title, 50)}</h1>
         <div className="flex mt-5 items-center justify-between">
           <span className={`${categoryColor} py-[2px] px-3 rounded-full`}>

@@ -8,7 +8,7 @@ const loading = () => {
       </div>
       <div className="text-center h-10 w-full mt-8 rounded-full bg-secondary-900 animate-pulse"></div>
       <div className="text-center h-10 w-full mt-2 rounded-full bg-secondary-900 animate-pulse"></div>
-      <div className="mt-8 rounded-2xl h-[550px] object-cover bg-secondary-900 animate-pulse"></div>
+      <div className="mt-8 rounded-2xl pb-[80%] max-h-[550px] object-cover bg-secondary-900 animate-pulse"></div>
       <section className="xl:grid xl:grid-cols-[35%_61%] xl:mt-16 xl:gap-[4%]">
         <section className="mt-6 xl:mt-0">
           <div className="xl:sticky xl:top-28">

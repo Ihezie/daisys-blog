@@ -47,7 +47,7 @@ const CategoryCarousel = ({
   }, []);
 
   return (
-    <section className="my-16">
+    <section className="mt-16">
       <h2 className="text-center">Categories</h2>
       <section className="relative">
         <div className="absolute abs-center-y -left-16 hidden md:flex xxl:hidden">
@@ -55,7 +55,7 @@ const CategoryCarousel = ({
         </div>
         <div
           ref={cardsContainerParentRef}
-          className="pt-8 pb-10 md:overflow-x-hidden"
+          className="pt-8 md:overflow-x-hidden"
         >
           <div
             ref={cardsContainerRef}
