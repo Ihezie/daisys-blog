@@ -91,7 +91,7 @@
   .custom-transition-all {
     @apply transition-all duration-500;
   }
-  .custom-transition-all * {
+  .custom-transition-all {
     @apply transition-all duration-500;
   }
   .abs-center-x {

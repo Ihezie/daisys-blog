@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
-const SearchBar = () => {
+const SearchBar = ({ fullWidth }: { fullWidth?: boolean }) => {
   const handleSearch = useDebouncedCallback((value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value) {
@@ -17,7 +17,9 @@ const SearchBar = () => {
   const pathname = usePathname();
   const { replace } = useRouter();
   return (
-    <div className="pl-5 pr-2 py-[6px] grid grid-cols-[auto_45px] border-2 border-gray-300 text-lg rounded-full items-center has-[:focus]:border-secondary-700 custom-transition sm:w-1/2">
+    <div
+      className={`pl-5 pr-2 py-[6px] grid grid-cols-[auto_45px] border-2 border-gray-300 text-lg rounded-full items-center has-[:focus]:border-secondary-700 custom-transition ${fullWidth ? "w-full" : "sm:w-1/2"} `}
+    >
       <input
         id="search"
         placeholder="Search..."

@@ -21,5 +21,10 @@ export const userType = defineType({
       name: "avatar",
       type: "url",
     }),
+    defineField({
+      name: "favouritePosts",
+      type: "array",
+      of: [{ type: "reference", to: { type: "post" } }],
+    }),
   ],
 });

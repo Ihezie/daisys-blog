@@ -11,7 +11,7 @@ export default async function Layout({
   return (
     <>
       <section
-        className={`max-w-[1440px] min-h-[78vh] mx-auto px-[5%] pt-5 sm:px-[10%] xl:px-[13%] xxl:px-[187px] ${josefinSans.variable} ${oswald.variable}`}
+        className={`max-w-[1440px] min-h-[78vh] mx-auto px-[5%] pt-5 sm:px-[10%] md:min-h-[85vh] xl:px-[13%] xxl:px-[187px] ${josefinSans.variable} ${oswald.variable}`}
       >
         <Header />
         {children}

@@ -142,6 +142,13 @@ export type User = {
   name?: string;
   email?: string;
   avatar?: string;
+  favouritePosts?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "post";
+  }>;
 };
 
 export type Post = {
@@ -347,7 +354,7 @@ export type AllSanitySchemaTypes = Reply | Comment | User | Post | Category | Sa
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/lib/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }
+// Query: *[_type == "post" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, "noOfComments": count(*[_type == "comment" && references(^._id)])}
 export type POSTS_QUERYResult = Array<{
   _id: string;
   slug: Slug | null;
@@ -387,6 +394,7 @@ export type POSTS_QUERYResult = Array<{
     _type: "block";
     _key: string;
   }> | null;
+  noOfComments: number;
 }>;
 // Variable: CATEGORY_NAMES_QUERY
 // Query: *[_type == "category" && defined(_id)]{_id, name}
@@ -610,7 +618,7 @@ export type COMMENTS_QUERYResult = Array<{
   }>;
 }>;
 // Variable: TOP_POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current)]|order(count(*[_type == "comment" && references(^._id)]) desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...3]
+// Query: *[_type == "post" && defined(slug.current)]|order(count(*[_type == "comment" && references(^._id)]) desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, "noOfComments": count(*[_type == "comment" && references(^._id)])}[0...3]
 export type TOP_POSTS_QUERYResult = Array<{
   _type: "post";
   _id: string;
@@ -651,19 +659,74 @@ export type TOP_POSTS_QUERYResult = Array<{
     _type: "block";
     _key: string;
   }> | null;
+  noOfComments: number;
 }>;
+// Variable: FAVOURITE_POSTS_QUERY
+// Query: *[_type == "user" && _id == $id][0]{favouritePosts[(!defined($term) || @->.title match $term)]-> { _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, "noOfComments": count(*[_type == "comment" && references(^._id)])}}
+export type FAVOURITE_POSTS_QUERYResult = {
+  favouritePosts: Array<{
+    _id: string;
+    slug: Slug | null;
+    title: string | null;
+    publishedAt: string | null;
+    category: {
+      name: string | null;
+      tailwindColor: string | null;
+    } | null;
+    image: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    body: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+    noOfComments: number;
+  }> | null;
+} | null;
+// Variable: FAVOURITE_POSTS_IDS_QUERY
+// Query: *[_type == "user" && _id == $id][0]{favouritePosts[]-> {_id}}
+export type FAVOURITE_POSTS_IDS_QUERYResult = {
+  favouritePosts: Array<{
+    _id: string;
+  }> | null;
+} | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }": POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && (!defined($term) || title match $term) && (!defined($filter) || category->name match $filter)]|order(publishedAt desc){ _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, \"noOfComments\": count(*[_type == \"comment\" && references(^._id)])}": POSTS_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name}": CATEGORY_NAMES_QUERYResult;
     "*[_type == \"category\" && defined(_id)]{_id, name, animatedIcon, tailwindColor, image}": CATEGORIES_QUERYResult;
     "*[_type == \"post\" && defined(slug.current)]|order(publishedAt desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...5]": CAROUSEL_POSTS_QUERYResult;
     "*[_type == \"post\" && defined(slug.current) && $slug == slug.current]{_id, title, publishedAt, category -> {name, tailwindColor}, image, body}[0]": SINGLE_POST_QUERYResult;
     "*[_type == \"user\" && id == $id][0]{_id, name, avatar}": USER_BY_ID_QUERYResult;
     "*[_type == \"comment\" && post._ref == $postId]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, body, likes, dislikes,\n  \"replies\": *[_type == \"reply\" && references(^._id)]|order(publishedAt desc){_id, publishedAt, user -> { _id, name, avatar}, post -> {_id}, comment -> {_id}, body, likes, dislikes}}": COMMENTS_QUERYResult;
-    "*[_type == \"post\" && defined(slug.current)]|order(count(*[_type == \"comment\" && references(^._id)]) desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body }[0...3]": TOP_POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current)]|order(count(*[_type == \"comment\" && references(^._id)]) desc){ _type, _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, \"noOfComments\": count(*[_type == \"comment\" && references(^._id)])}[0...3]": TOP_POSTS_QUERYResult;
+    "*[_type == \"user\" && _id == $id][0]{favouritePosts[(!defined($term) || @->.title match $term)]-> { _id, slug, title, publishedAt, category -> {name, tailwindColor}, image, body, \"noOfComments\": count(*[_type == \"comment\" && references(^._id)])}}": FAVOURITE_POSTS_QUERYResult;
+    "*[_type == \"user\" && _id == $id][0]{favouritePosts[]-> {_id}}": FAVOURITE_POSTS_IDS_QUERYResult;
   }
 }

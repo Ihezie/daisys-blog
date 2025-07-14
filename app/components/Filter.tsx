@@ -43,7 +43,7 @@ export default function Filter({
       }}
       defaultValue={searchParams.get("filter") || "all"}
     >
-      <SelectTrigger className="w-[170px]">
+      <SelectTrigger className={`w-[170px] hover:text-secondary font-bold`}>
         <SelectValue placeholder="all categories" />
       </SelectTrigger>
       <SelectContent>

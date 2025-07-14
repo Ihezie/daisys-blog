@@ -2,10 +2,9 @@
 import { signIn, auth, signOut } from "@/auth";
 import { writeClient } from "@/sanity/lib/write-client";
 import type { PortableTextBlock } from "@portabletext/editor";
-import { internalGroqTypeReferenceTo } from "@/sanity.types";
+import { revalidateTag } from "next/cache";
 
 export const signInAction = async () => {
-  // "use server";
   await signIn("google");
 };
 export const signOutAction = async () => {
@@ -135,5 +134,25 @@ export const dislikeCommentAction = async (
 };
 export const deleteCommentAction = async (id: string) => {
   await writeClient.delete(id);
+};
+export const handleFavouritesAction = async (postId: string, add: boolean) => {
+  const userId = (await auth())?.id;
+  if (!userId) return;
+  let item;
+  if (add) {
+    item = await writeClient
+      .patch(userId)
+      .setIfMissing({ favouritePosts: [] })
+      .insert("after", "favouritePosts[-1]", [
+        { _type: "reference", _ref: postId },
+      ])
+      .commit({ autoGenerateArrayKeys: true });
+  } else {
+    item = await writeClient
+      .patch(userId)
+      .unset([`favouritePosts[_ref=="${postId}"]`])
+      .commit();
+  }
+  revalidateTag("favourites");
 };
 // writeClient.delete({query: '*[_type == "comment"]'})

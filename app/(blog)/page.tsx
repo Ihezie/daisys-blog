@@ -35,7 +35,7 @@ export default async function Home() {
         <CategoryCarousel rawCategories={categories} />
       </Suspense>
       <Suspense fallback={<TopPostsSkeleton />}>
-        <TopPosts rawTopPosts={topPosts} />
+        <TopPosts rawTopPosts={topPosts} session={session} />
       </Suspense>
     </main>
   );
