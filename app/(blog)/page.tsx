@@ -14,16 +14,20 @@ import TopPosts from "../components/home/TopPosts";
 import TopPostsSkeleton from "../components/loading_skeletons/TopPostsSkeleton";
 
 export default async function Home() {
-  const categories = client.fetch(CATEGORIES_QUERY, {});
+  const categories = client.fetch(
+    CATEGORIES_QUERY,
+    {},
+    { next: { revalidate: 3600 } }
+  );
   const carouselPosts = client.fetch(
     CAROUSEL_POSTS_QUERY,
     {},
-    { next: { revalidate: 30 } }
+    { next: { revalidate: 60 } }
   );
   const topPosts = client.fetch(
     TOP_POSTS_QUERY,
     {},
-    { next: { revalidate: 30 } }
+    { next: { revalidate: 60 } }
   );
   const session = await auth();
   return (

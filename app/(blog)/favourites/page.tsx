@@ -56,7 +56,7 @@ const Favourites = async (props: {
       {posts.length > 0 ? (
         <section className="grid grid-cols-auto-fill gap-8 justify-between max-[740px]:justify-center">
           {posts.map((post) => (
-            <PostCard post={post} key={post._id} inFavourites={true} />
+            <PostCard post={post} key={post._id} inFavourites={true} session={session} />
           ))}
         </section>
       ) : (

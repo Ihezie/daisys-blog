@@ -31,7 +31,7 @@ const TopPosts = async ({
     });
   } 
   return (
-    <section className="mt-16">
+    <section className="mt-16 md:mt-12">
       <h2 className="text-center mb-8">Top Posts</h2>
       <section className="grid grid-cols-auto-fill gap-8 justify-between max-[740px]:justify-center">
         {topPosts.map((post) => (

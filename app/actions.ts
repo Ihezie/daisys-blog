@@ -133,6 +133,9 @@ export const dislikeCommentAction = async (
   return patchedComment;
 };
 export const deleteCommentAction = async (id: string) => {
+  await writeClient.delete({
+    query: `*[_type == "reply" && references("${id}")] `,
+  });
   await writeClient.delete(id);
 };
 export const handleFavouritesAction = async (postId: string, add: boolean) => {
@@ -155,4 +158,4 @@ export const handleFavouritesAction = async (postId: string, add: boolean) => {
   }
   revalidateTag("favourites");
 };
-// writeClient.delete({query: '*[_type == "comment"]'})
+// writeClient.delete({query: '*[_type == "comment" || _type == "reply"]'})

@@ -55,7 +55,7 @@ const CategoryCarousel = ({
         </div>
         <div
           ref={cardsContainerParentRef}
-          className="pt-8 md:overflow-x-hidden"
+          className="pt-8 md:overflow-x-hidden md:pb-8"
         >
           <div
             ref={cardsContainerRef}
