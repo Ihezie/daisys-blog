@@ -25,7 +25,7 @@ export const aboutBlog: AboutBlog = {
   id: "blog-desc",
   image: "/daisy/daisy-6.jpg",
   title: "Hey stranger!",
-  body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci, eligendi a! Qui impedit dolore magni omnis sunt! Adipisci a placeat distinctio et necessitatibus enim quod voluptates sit, commodi earum dolor?",
+  body: "This is a lifestyle blog inspired by my sister. It doesn't contain any real posts for now. All posts are AI-generated for demo purposes. Don't bother clicking on the social links either; they're purely decorative (wouldn't want to expose her info 😅). Enjoy!❤️",
   socials: [
     { icon: "/social-icons/black/tik-tok.png", name: "tik-tok", link: "" },
     {
