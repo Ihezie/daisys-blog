@@ -64,7 +64,7 @@ const Comment = ({
 
   const [showReplies, setShowReplies] = useState(false);
 
-  const [_, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const handleReaction = (type: "like" | "dislike") => {
     if (!session) {

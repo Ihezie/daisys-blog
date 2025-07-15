@@ -3,7 +3,6 @@ import { links } from "../../data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
-import SignIn from "../SignIn";
 
 const container = {
   hide: {

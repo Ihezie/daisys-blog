@@ -141,9 +141,8 @@ export const deleteCommentAction = async (id: string) => {
 export const handleFavouritesAction = async (postId: string, add: boolean) => {
   const userId = (await auth())?.id;
   if (!userId) return;
-  let item;
   if (add) {
-    item = await writeClient
+    await writeClient
       .patch(userId)
       .setIfMissing({ favouritePosts: [] })
       .insert("after", "favouritePosts[-1]", [
@@ -151,7 +150,7 @@ export const handleFavouritesAction = async (postId: string, add: boolean) => {
       ])
       .commit({ autoGenerateArrayKeys: true });
   } else {
-    item = await writeClient
+    await writeClient
       .patch(userId)
       .unset([`favouritePosts[_ref=="${postId}"]`])
       .commit();

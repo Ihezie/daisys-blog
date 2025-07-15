@@ -6,12 +6,13 @@ import {
   PortableTextEditable,
 } from "@portabletext/editor";
 import type {
+  Editor,
   PortableTextBlock,
   RenderDecoratorFunction,
   RenderStyleFunction,
 } from "@portabletext/editor";
 import { EventListenerPlugin } from "@portabletext/editor/plugins";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useState } from "react";
 import { useEditor, useEditorSelector } from "@portabletext/editor";
 import {
   ALargeSmall,
@@ -115,7 +116,14 @@ const CustomInput = ({
         (block) =>
           block._type !== "block" ||
           !Array.isArray(block.children) ||
-          block.children.every((child: any) => !child.text?.trim())
+          block.children.every(
+            (child: {
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }) => !child.text?.trim()
+          )
       );
     return result;
   };
@@ -139,7 +147,7 @@ const CustomInput = ({
           post: {
             _id: postId as string,
           },
-          body: value as any,
+          body: value as Array<PortableTextBlock>,
           likes: [],
           dislikes: [],
         };
@@ -160,7 +168,7 @@ const CustomInput = ({
             });
             return newState;
           });
-          setShowReplyInput && setShowReplyInput(false);
+          if (setShowReplyInput) setShowReplyInput(false);
         } else {
           handleOptimisticComments({
             type: "ADD COMMENT",
@@ -270,52 +278,104 @@ function Toolbar({ type = "comment" }: { type: "comment" | "reply" }) {
   };
   // useEditor provides access to the PTE
   const editor = useEditor();
-  const styleButtons = schemaDefinition.styles.map((style) => {
-    const active = useEditorSelector(
-      editor,
-      selectors.isActiveStyle(style.name)
-    );
-    return (
-      <button
-        key={style.name}
-        type="button"
-        onClick={() => {
-          // Send style toggle event
-          editor.send({ type: "style.toggle", style: style.name });
-          editor.send({ type: "focus" });
-        }}
-        className={active ? "active-decorator" : "editor-btn"}
-      >
-        {styleIcons[style.name]}
-      </button>
-    );
-  });
-  const decoratorButtons = schemaDefinition.decorators.map((decorator) => {
-    const active = useEditorSelector(
-      editor,
-      selectors.isActiveDecorator(decorator.name)
-    );
-    return (
-      <button
-        key={decorator.name}
-        type="button"
-        onClick={() => {
-          // Send decorator toggle event
-          editor.send({ type: "decorator.toggle", decorator: decorator.name });
-          editor.send({ type: "focus" });
-        }}
-        className={active ? "active-decorator" : "editor-btn"}
-      >
-        {decoratorIcons[decorator.name]}
-      </button>
-    );
-  });
-
   return (
     <div className="flex justify-between w-[77%] xs:w-auto xs:gap-[6px] sm:gap-3">
-      {styleButtons}
+      {schemaDefinition.styles.map((style) => (
+        <StyleButton
+          key={style.name}
+          editor={editor}
+          style={style}
+          styleIcon={styleIcons[style.name]}
+        />
+      ))}
       <div className="border-r-black/30 bg-black/30 border"></div>
-      {decoratorButtons}
+      {schemaDefinition.decorators.map((decorator) => (
+        <DecoratorButton
+          key={decorator.name}
+          editor={editor}
+          decorator={decorator}
+          decoratorIcon={decoratorIcons[decorator.name]}
+        />
+      ))}
     </div>
+  );
+}
+
+function StyleButton({
+  editor,
+  style,
+  styleIcon,
+}: {
+  editor: Editor;
+  style:
+    | {
+        readonly name: "normal";
+      }
+    | {
+        readonly name: "h1";
+      }
+    | {
+        readonly name: "h2";
+      }
+    | {
+        readonly name: "h3";
+      }
+    | {
+        readonly name: "blockquote";
+      };
+  styleIcon: React.ReactNode;
+}) {
+  const active = useEditorSelector(editor, selectors.isActiveStyle(style.name));
+  return (
+    <button
+      key={style.name}
+      type="button"
+      onClick={() => {
+        // Send style toggle event
+        editor.send({ type: "style.toggle", style: style.name });
+        editor.send({ type: "focus" });
+      }}
+      className={active ? "active-decorator" : "editor-btn"}
+    >
+      {styleIcon}
+    </button>
+  );
+}
+
+function DecoratorButton({
+  editor,
+  decorator,
+  decoratorIcon,
+}: {
+  editor: Editor;
+  decorator:
+    | {
+        readonly name: "strong";
+      }
+    | {
+        readonly name: "em";
+      }
+    | {
+        readonly name: "underline";
+      };
+  decoratorIcon: React.ReactNode;
+}) {
+  const active = useEditorSelector(
+    editor,
+    selectors.isActiveDecorator(decorator.name)
+  );
+  return (
+    <button
+      key={decorator.name}
+      type="button"
+      onClick={() => {
+        // Send decorator toggle event
+        editor.send({ type: "decorator.toggle", decorator: decorator.name });
+        editor.send({ type: "focus" });
+      }}
+      className={active ? "active-decorator" : "editor-btn"}
+    >
+      {decoratorIcon}
+    </button>
   );
 }

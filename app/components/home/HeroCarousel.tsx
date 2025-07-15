@@ -45,7 +45,7 @@ const HeroCarousel = ({
         api.scrollTo(0);
       }
     }
-  }, [session]);
+  }, [session, api, current]);
 
   useEffect(() => {
     if (!api) {
@@ -97,11 +97,11 @@ const HeroCarousel = ({
               <CarouselItem
                 key={item.title}
                 onClick={() => {
-                  item._type === "post"
-                    ? router.push(
-                        `/posts/${(item as CAROUSEL_POSTS_QUERYResult[0]).slug?.current}`
-                      )
-                    : null;
+                  if (item._type === "post") {
+                    router.push(
+                      `/posts/${(item as CAROUSEL_POSTS_QUERYResult[0]).slug?.current}`
+                    );
+                  }
                 }}
               >
                 <Image

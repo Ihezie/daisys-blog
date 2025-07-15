@@ -31,7 +31,7 @@ const CategoryCarousel = ({
     }
   };
   useEffect(() => {
-    let id: any;
+    let id: NodeJS.Timeout;
     const handler = () => {
       clearTimeout(id);
       id = setTimeout(() => {

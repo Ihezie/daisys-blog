@@ -30,7 +30,7 @@ const Favourites = async (props: {
   }
 
   const searchParams = await props.searchParams;
-  let params = {
+  const params = {
     id: session?.id || "",
     term: searchParams?.term || null,
   };

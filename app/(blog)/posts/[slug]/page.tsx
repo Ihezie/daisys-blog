@@ -38,7 +38,7 @@ const Post = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const categoryColor = post?.category?.tailwindColor || "bg-purple-400";
 
   // fetch comments
-  let { data: comments }: { data: Array<COMMENT> } = await sanityFetch({
+  const { data: comments }: { data: Array<COMMENT> } = await sanityFetch({
     query: COMMENTS_QUERY,
     params: { postId: post?._id },
   });

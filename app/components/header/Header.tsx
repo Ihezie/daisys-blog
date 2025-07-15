@@ -7,12 +7,10 @@ import { AnimatePresence } from "motion/react";
 import DesktopNav from "./DesktopNav";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import UserDetails from "./UserDetails";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const pathName = usePathname();
   return (
     <>
       <header

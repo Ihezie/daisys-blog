@@ -24,7 +24,7 @@ const Posts = async (props: {
   searchParams?: Promise<{ term?: string; filter?: string }>;
 }) => {
   const searchParams = await props.searchParams;
-  let params = {
+  const params = {
     term: searchParams?.term || null,
     filter: searchParams?.filter || null,
   };

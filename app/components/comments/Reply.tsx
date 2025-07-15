@@ -106,7 +106,7 @@ const Reply = ({
     reactions,
     optimisticReactionsReducer
   );
-  const [_, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const handleReaction = (type: "like" | "dislike") => {
     if (!session) {
