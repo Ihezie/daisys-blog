@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The "Unripe Plantain" Blog
 
-## Getting Started
+## Description
 
-First, run the development server:
+A simple blog I built to learn Next.js and how to integrate it with a CMS. It is a women's lifestyle blog inspired by my sister. The idea was to create a digital space where someone like my sister could share her thoughts and ideas about different topics concerning women.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Users can sign in with Google, allowing them to add posts to their favourites, comment on posts, reply to comments, and like comments. Google is the only sign in option at the moment - simply because it was easy to implement.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Homepage Screenshot
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![Screenshot of the Homepage](./screenshot.png)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tools Used
 
-## Learn More
+- [Next.JS](https://nextjs.org)
+- [Sanity CMS](https://www.sanity.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Shadcn Component Library](https://ui.shadcn.com/)
 
-To learn more about Next.js, take a look at the following resources:
+*Live site URL - (unripe-plantain.vercel.app)[https://unripe-plantain.vercel.app/]*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
