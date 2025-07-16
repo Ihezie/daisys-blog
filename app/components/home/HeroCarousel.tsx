@@ -39,15 +39,6 @@ const HeroCarousel = ({
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    if (!session?.user && current != 0) {
-      setCurrent(0);
-      if (api) {
-        api.scrollTo(0);
-      }
-    }
-  }, [session, api, current]);
-
-  useEffect(() => {
     if (!api) {
       return;
     }
@@ -136,7 +127,7 @@ const TextSection = ({
         <header className="flex gap-3 items-center justify-center lg:justify-start">
           <h1>{currentItemData.title}</h1>
           <Image
-            unoptimized
+          unoptimized
             src="/wave.gif"
             width={40}
             height={40}
