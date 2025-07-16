@@ -136,6 +136,7 @@ const TextSection = ({
         <header className="flex gap-3 items-center justify-center lg:justify-start">
           <h1>{currentItemData.title}</h1>
           <Image
+            unoptimized
             src="/wave.gif"
             width={40}
             height={40}
