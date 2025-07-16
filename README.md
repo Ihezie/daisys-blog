@@ -2,9 +2,9 @@
 
 ## Description
 
-A simple blog I built to learn Next.js and how to integrate it with a CMS. It is a women's lifestyle blog inspired by my sister. The idea was to create a digital space where someone like my sister could share her thoughts and ideas about different topics concerning women.
+A simple blog I built to learn Next.js and how to integrate it with a CMS. It's a women's lifestyle blog inspired by my sister. The idea was to create a digital space where someone like her could share thoughts and ideas on various topics concerning women.
 
-Users can sign in with Google, allowing them to add posts to their favourites, comment on posts, reply to comments, and like comments. Google is the only sign in option at the moment - simply because it was easy to implement.
+Users can sign in with Google, which allows them to add posts to their favourites, comment on posts, reply to comments, and like comments. Google is the only sign-in option at the moment — simply because it was the easiest to implement.
 
 ## Homepage Screenshot
 
@@ -17,6 +17,6 @@ Users can sign in with Google, allowing them to add posts to their favourites, c
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Shadcn Component Library](https://ui.shadcn.com/)
 
-*Live site URL - (unripe-plantain.vercel.app)[https://unripe-plantain.vercel.app/]*
+*Live site URL* - (unripe-plantain.vercel.app)[https://unripe-plantain.vercel.app/]
 
 
