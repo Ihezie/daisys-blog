@@ -10,7 +10,8 @@ export const metadata: Metadata = {
     template: "Unripe-plantain | %s",
     default: "Unripe-plantain",
   },
-  description: "A blog where she shares stuff",
+  description:
+    "A women's lifestyle blog offering insights, ideas, and everyday inspiration—plus the ability to comment, like, and save your favourite posts.",
 };
 
 export default async function RootLayout({
